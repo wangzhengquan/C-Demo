@@ -32,7 +32,4 @@
 *.app
 *.tar
 *.tar.gz
-
-svshm_reader
-svshm_writer
-test_allocator
+.vscode/

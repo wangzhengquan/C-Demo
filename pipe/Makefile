@@ -6,11 +6,9 @@ PROGS =	pipe1 test
 
 all:	$(PROGS)
 
-%:	%.c $(LIBCOMMON)
-	$(CC) $(CFLAGS) $@.c -o $@ $(LDFLAGS) $(LDLIBS)
 
 
 clean:
 	rm -f $(PROGS) $(TEMPFILES) *.o
 
-include $(ROOT)/Make.libapue.inc
+include $(ROOT)/Make.common.inc
