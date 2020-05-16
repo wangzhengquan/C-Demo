@@ -12,8 +12,8 @@ OBJS   = common.o
 all:	$(LIBCOMMON)
 
 $(LIBCOMMON):	$(OBJS)
-	$(AR) rv $(LIBMISC) $?
-	$(RANLIB) $(LIBMISC)
+	$(AR) rv $(LIBCOMMON) $?
+	$(RANLIB) $(LIBCOMMON)
 
 
 clean:

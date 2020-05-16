@@ -2,9 +2,6 @@
 #include <errno.h>		/* for definition of errno */
 #include <stdarg.h>		/* ISO C variable aruments */
 
-int main() {
-  return 0;
-}
 /**************************
  * Error-handling functions
  **************************/
