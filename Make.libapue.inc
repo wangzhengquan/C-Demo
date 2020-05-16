@@ -1,2 +1,2 @@
-$(LIBAPUE):
-	(cd $(ROOT)/lib && $(MAKE))
+$(LIBCOMMON):
+	(cd $(ROOT)/common && $(MAKE))

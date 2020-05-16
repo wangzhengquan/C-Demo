@@ -6,7 +6,7 @@ PROGS =	pipe1 test
 
 all:	$(PROGS)
 
-%:	%.c $(LIBAPUE)
+%:	%.c $(LIBCOMMON)
 	$(CC) $(CFLAGS) $@.c -o $@ $(LDFLAGS) $(LDLIBS)
 
 

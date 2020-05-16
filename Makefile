@@ -1,4 +1,4 @@
-DIRS = lib pipe
+DIRS = common pipe
 
 all:
 	for i in $(DIRS); do \

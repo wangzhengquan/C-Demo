@@ -5,17 +5,18 @@ ROOT=..
 PLATFORM=$(shell $(ROOT)/systype.sh)
 include $(ROOT)/Make.defines.$(PLATFORM)
 
-LIBMISC	= libapue.a
-OBJS   = error.o
+# LIBMISC	= libcommon.a
+LIBCOMMON = libcommon.a
+OBJS   = common.o
 
-all:	$(LIBMISC)
+all:	$(LIBCOMMON)
 
-$(LIBMISC):	$(OBJS)
+$(LIBCOMMON):	$(OBJS)
 	$(AR) rv $(LIBMISC) $?
 	$(RANLIB) $(LIBMISC)
 
 
 clean:
-	rm -f *.o a.out core temp.* $(LIBMISC)
+	rm -f *.o a.out core temp.* $(LIBCOMMON)
 
 # include $(ROOT)/Make.libapue.inc
