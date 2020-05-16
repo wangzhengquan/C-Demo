@@ -4,9 +4,10 @@ include $(ROOT)/Make.defines.$(PLATFORM)
 
 PROGS =	pipe1 test
 
-all:	$(PROGS)
+all: $(PROGS)
 
-
+%:	%.c $(LIBCOMMON)
+	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS) $(LDLIBS)
 
 clean:
 	rm -f $(PROGS) $(TEMPFILES) *.o

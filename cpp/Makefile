@@ -15,6 +15,10 @@ usetime3: usetime3.c mytime3.c mytime3.h
 # class inheritance: polymorphic public inheritance
 usebrass2: usebrass2.c brass.c brass.h
 
+
+%:	%.c $(LIBCOMMON)
+	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS) $(LDLIBS)
+
 clean:
 	rm -f $(PROGS) $(TEMPFILES) *.o
 
