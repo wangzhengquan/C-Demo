@@ -7,7 +7,6 @@ PROGS =	 test1
 all: $(PROGS)
 
 
-
 clean:
 	rm -f $(PROGS) $(TEMPFILES) *.o
 
