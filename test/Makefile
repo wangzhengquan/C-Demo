@@ -6,8 +6,7 @@ PROGS =	 test1
 
 all: $(PROGS)
 
-%:	%.c $(LIBCOMMON)
-	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS) $(LDLIBS)
+
 
 clean:
 	rm -f $(PROGS) $(TEMPFILES) *.o

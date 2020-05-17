@@ -2,7 +2,7 @@ ROOT=..
 PLATFORM=$(shell $(ROOT)/systype.sh)
 include $(ROOT)/Make.defines.$(PLATFORM)
 
-PROGS =	usestock1 usetime3 usebrass2
+PROGS =	usestock1 usetime3 usebrass2 vegnews
 
 all:	$(PROGS)
 
@@ -15,11 +15,10 @@ usetime3: usetime3.c mytime3.c mytime3.h
 # class inheritance: polymorphic public inheritance
 usebrass2: usebrass2.c brass.c brass.h
 
-
-%:	%.c $(LIBCOMMON)
-	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS) $(LDLIBS)
+# class: copy constructor, move constructor
+vegnews:  string1.c string1.h
 
 clean:
-	rm -f $(PROGS) $(TEMPFILES) *.o
+	rm -f $(PROGS) $(TEMPFILES)
 
 include $(ROOT)/Make.common.inc

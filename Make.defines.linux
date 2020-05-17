@@ -15,5 +15,10 @@ AR=ar
 AWK=awk
 LIBCOMMON=$(ROOT)/common/libcommon.a
 
+
 # Common temp files to delete from each directory.
-TEMPFILES=core core.* *.o temp.* *.out
+TEMPFILES=core core.* *.o temp.* *.out *.a *.so
+
+%:	%.c $(LIBCOMMON)
+	$(CC) $(CFLAGS) $(filter-out $(LIBCOMMON), $^) -o $@ $(LDFLAGS) $(LDLIBS)
+

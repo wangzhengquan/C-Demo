@@ -5,9 +5,8 @@ ROOT=..
 PLATFORM=$(shell $(ROOT)/systype.sh)
 include $(ROOT)/Make.defines.$(PLATFORM)
 
-# LIBMISC	= libcommon.a
-# LIBCOMMON = libcommon.a
-LIBCOMMON = libcommon.so
+LIBCOMMON = libcommon.a
+DLIBCOMMON = libcommon.so
 
 OBJS   = common.o
 
@@ -15,15 +14,15 @@ all: $(LIBCOMMON)
 
 
 #static lib
-#$(LIBCOMMON):	$(OBJS)
-#	$(AR) rv $@ $?
-#	$(RANLIB) $@
+$(LIBCOMMON):	$(OBJS)
+	$(AR) rv $@ $?
+	$(RANLIB) $@
 
 #dynamic lib
-$(LIBCOMMON):	$(OBJS)
+$(DLIBCOMMON):	$(OBJS)
 	$(CC) -fPIC -shared -o $@ $^
 
 clean:
-	rm -f *.o a.out core temp.* $(LIBCOMMON)
+	rm -f *.o a.out core temp.* *.a *.so
 
 # include $(ROOT)/Make.libapue.inc

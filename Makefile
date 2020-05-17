@@ -1,4 +1,4 @@
-DIRS = common pipe cpp
+DIRS = common pipe cpp test
 
 all:
 	for i in $(DIRS); do \
