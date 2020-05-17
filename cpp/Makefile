@@ -2,7 +2,7 @@ ROOT=..
 PLATFORM=$(shell $(ROOT)/systype.sh)
 include $(ROOT)/Make.defines.$(PLATFORM)
 
-PROGS =	usestock1 usetime3 usebrass2 vegnews stdmove
+PROGS =	usestock1 usetime3 usebrass2 vegnews stdmove typecast
 
 all:	$(PROGS)
 
@@ -20,6 +20,8 @@ vegnews:  string1.c string1.h
 
 # class: copy constructors, move constructors, copy assignment operators, and move assignment operators
 stdmove: stdmove.c
+
+typecast: typecast.c
 
 clean:
 	rm -f $(PROGS) $(TEMPFILES)
