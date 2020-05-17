@@ -4,7 +4,7 @@
 using std::cin;
 using std::cout;
 /**
- * 如果构造方法里使用了 dynamic memory allocation， 需要重写copy constructor 和 move constructor
+ * 如果构造方法里使用了 dynamic memory allocation， 需要重写copy constructor 和 assigment operator
  */
 
 // initializing static class member
@@ -51,7 +51,7 @@ String::~String()                     // necessary destructor
 
 // overloaded operator methods    
 
-// move constructor, assign a String to a String
+// copy assigment
 String & String::operator=(const String & st)
 {
     if (this == &st)
@@ -73,7 +73,7 @@ String & String::operator=(const char * s)
     return *this;
 }
 
-    // read-write char access for non-const String
+// read-write char access for non-const String
 char & String::operator[](int i)
 {
     return str[i];
