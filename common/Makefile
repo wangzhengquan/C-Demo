@@ -8,7 +8,8 @@ include $(ROOT)/Make.defines.$(PLATFORM)
 LIBCOMMON = libcommon.a
 DLIBCOMMON = libcommon.so
 
-OBJS   = common.o
+SOURCES := $(wildcard *.c)
+OBJS   = $(patsubst %.c, %.o, $(SOURCES)) 
 
 all: $(LIBCOMMON)
 
@@ -28,11 +29,11 @@ ifeq ($(PREFIX),)
 endif
 
 # 使用方式： g++ test1.c  -lcommon
-install: $(DLIBCOMMON) $(LIBCOMMON)
+install: $(LIBCOMMON) $(DLIBCOMMON)
 	sudo install -d $(PREFIX)/lib/
 	sudo install -m 644 $^ $(PREFIX)/lib/
 	sudo install -d $(PREFIX)/include/
-	sudo install -m 644 common.h $(PREFIX)/include/
+	sudo install -m 644 include/* $(PREFIX)/include/
 
 clean:
 	rm -f *.o a.out core temp.* *.a *.so

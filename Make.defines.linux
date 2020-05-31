@@ -9,7 +9,7 @@ LINK.c = $(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS)
 LDFLAGS=
 LDDIR = -L$(ROOT)/common
 LDLIBS = $(LDDIR) -lcommon $(EXTRALIBS)
-CFLAGS += -I$(ROOT)/common -I. -std=c++11 -Wall -DLINUX -D_GNU_SOURCE $(EXTRA)
+CFLAGS += $(INCLUDE) -I. -I./include  -I$(ROOT)/common -std=c++11 -Wall -DLINUX -D_GNU_SOURCE $(EXTRA)
 RANLIB=echo
 AR=ar
 AWK=awk
@@ -21,4 +21,3 @@ TEMPFILES=core core.* *.o temp.* *.out *.a *.so
 
 %:	%.c $(LIBCOMMON)
 	$(CC) $(CFLAGS) $(filter-out $(LIBCOMMON), $^) -o $@ $(LDFLAGS) $(LDLIBS)
-
