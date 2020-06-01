@@ -1,7 +1,8 @@
-#include "common.h"
+#include "usg_common.h"
 #include <errno.h>		/* for definition of errno */
 #include <stdarg.h>		/* ISO C variable aruments */
 
+#define MAXLINE 4096      /* max line length */
 /**************************
  * Error-handling functions
  **************************/
@@ -38,9 +39,10 @@ void err_exit(int error, const char *fmt, ...)
 	va_start(ap, fmt);
 	err_doit(error, fmt, ap);
 	va_end(ap);
-	abort();		/* dump core and terminate */
+	//abort();		/* dump core and terminate */
 	exit(1);
 }
+
 
 
 /*

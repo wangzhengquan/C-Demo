@@ -3,16 +3,17 @@
 #
 ROOT=..
 PLATFORM=$(shell $(ROOT)/systype.sh)
+INCLUDE+=-I./include
 include $(ROOT)/Make.defines.$(PLATFORM)
 
-LIBCOMMON = libcommon.a
-DLIBCOMMON = libcommon.so
+LIBCOMMON = libusgcommon.a
+DLIBCOMMON = libusgcommon.so
 
-SOURCES := $(wildcard *.c)
-OBJS   = $(patsubst %.c, %.o, $(SOURCES)) 
+OBJS   = usg_common.o
 
 all: $(LIBCOMMON)
 
+test: test.c 
 
 #static lib
 $(LIBCOMMON):	$(OBJS)
@@ -29,7 +30,7 @@ ifeq ($(PREFIX),)
 endif
 
 # 使用方式： g++ test1.c  -lcommon
-install: $(LIBCOMMON) $(DLIBCOMMON)
+install: $(DLIBCOMMON) $(LIBCOMMON)
 	sudo install -d $(PREFIX)/lib/
 	sudo install -m 644 $^ $(PREFIX)/lib/
 	sudo install -d $(PREFIX)/include/

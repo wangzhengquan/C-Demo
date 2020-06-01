@@ -13,7 +13,7 @@ CFLAGS += $(INCLUDE) -I. -I./include  -I$(ROOT)/common -std=c++11 -Wall -DLINUX 
 RANLIB=echo
 AR=ar
 AWK=awk
-LIBCOMMON=$(ROOT)/common/libcommon.a
+LIBCOMMON=$(ROOT)/common/libusgcommon.a
 
 
 # Common temp files to delete from each directory.
