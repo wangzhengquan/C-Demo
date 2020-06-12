@@ -40,10 +40,13 @@ union semun {                   /* Used in calls to semctl() */
 #define DIR_MODE  (FILE_MODE | S_IXUSR | S_IXGRP | S_IXOTH)
 
 
-#define min(a,b)  ((a) < (b) ? (a) : (b))
-#define max(a,b)  ((a) > (b) ? (a) : (b))
+#define MIN(a,b)  ((a) < (b) ? (a) : (b))
+#define MAX(a,b)  ((a) > (b) ? (a) : (b))
 
- 
+
+/* Misc constants */
+#define	MAXLINE	 1024  /* Max text line length */
+#define MAXBUF   8192  /* Max I/O buffer size */
 
 #ifdef __cplusplus
 }

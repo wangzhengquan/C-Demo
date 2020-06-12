@@ -2,26 +2,29 @@
 # Makefile for common library.
 #
 ROOT=..
+
 PLATFORM=$(shell $(ROOT)/systype.sh)
 include $(ROOT)/Make.defines.$(PLATFORM)
-
+  
 LIBCOMMON = libusgcommon.a
 DLIBCOMMON = libusgcommon.so
 
 SOURCES := $(wildcard *.c)
 OBJS   = $(patsubst %.c, %.o, $(SOURCES)) 
 
-all: $(LIBCOMMON)
+
+all: $(LIBCOMMON) $(DLIBCOMMON)
 
 
 #static lib
-$(LIBCOMMON):	$(OBJS)
+$(LIBCOMMON): $(OBJS)
 	$(AR) rv $@ $?
 	$(RANLIB) $@
 
 #dynamic lib
-$(DLIBCOMMON):	$(OBJS)
-	$(CC) -fPIC -shared -o $@ $^
+$(DLIBCOMMON): $(SOURCES)
+	rm -f *.o
+	$(CC) -fPIC -shared $(CFLAGS) $^ -o $@ $(LDFLAGS)
 
 #PREFIX is environment variable, but if it is not set, then set default value
 ifeq ($(PREFIX),)
@@ -29,7 +32,7 @@ ifeq ($(PREFIX),)
 endif
 
 # 使用方式： g++ test1.c  -lcommon
-install: $(LIBCOMMON) $(DLIBCOMMON)
+install: $(DLIBCOMMON)
 	sudo install -d $(PREFIX)/lib/
 	sudo install -m 644 $^ $(PREFIX)/lib/
 	sudo install -d $(PREFIX)/include/

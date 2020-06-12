@@ -1,15 +1,15 @@
 #include "usg_common.h"
 #include <errno.h>		/* for definition of errno */
-#include <stdarg.h>		/* ISO C variable aruments */
 
 #define MAXLINE 4096      /* max line length */
 /**************************
  * Error-handling functions
  **************************/
-static void	err_doit(int, const char *, va_list);
-//static void err_doit(int errno, const char *fmt, va_list ap);
 
-/*void unix_error(const char *fmt, ...) [> Unix-style error <]*/
+static void	err_doit(int, const char *, va_list);
+
+ 
+/*void unix_error(const char *fmt, ...) */
 /*{*/
 	/*va_list		ap;*/
 
@@ -69,10 +69,48 @@ static void err_doit(int error, const char *fmt, va_list ap)
 
 	vsnprintf(buf, MAXLINE-1, fmt, ap);
 	if (error != 0) {
-		snprintf(buf+strlen(buf), MAXLINE-strlen(buf)-1, ": %s", strerror(error));	
+		snprintf(buf+strlen(buf), MAXLINE-strlen(buf)-1, ": %s", strerror(error));
 	}
 	strcat(buf, "\n");
 	fflush(stdout);		/* in case stdout and stderr are the same */
 	fputs(buf, stderr);
 	fflush(NULL);		/* flushes all stdio output streams */
+}
+
+char *ltrim(char *str, const char *seps)
+{
+    size_t totrim;
+    if (seps == NULL) {
+        seps = "\t\n\v\f\r ";
+    }
+    totrim = strspn(str, seps);
+    if (totrim > 0) {
+        size_t len = strlen(str);
+        if (totrim == len) {
+            str[0] = '\0';
+        }
+        else {
+            memmove(str, str + totrim, len + 1 - totrim);
+        }
+    }
+    return str;
+}
+
+char *rtrim(char *str, const char *seps)
+{
+    int i;
+    if (seps == NULL) {
+        seps = "\t\n\v\f\r ";
+    }
+    i = strlen(str) - 1;
+    while (i >= 0 && strchr(seps, str[i]) != NULL) {
+        str[i] = '\0';
+        i--;
+    }
+    return str;
+}
+
+char *trim(char *str, const char *seps)
+{
+    return ltrim(rtrim(str, seps), seps);
 }
