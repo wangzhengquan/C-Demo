@@ -18,7 +18,7 @@ LIBCOMMON=$(ROOT)/common/libusgcommon.a
 
 
 # Common temp files to delete from each directory.
-TEMPFILES=core core.* *.o temp.* *.out *.a *.so
+TEMPFILES=core core.* *.o temp.* *.out *.a *.so $(PROGS)
 
 %:	%.c $(LIBCOMMON)
 	$(CC) $(CFLAGS) $(filter-out $(LIBCOMMON), $^) -o $@ $(LDFLAGS) $(LDLIBS)
