@@ -12,8 +12,9 @@ DLIBCOMMON = libusgcommon.so
 SOURCES := $(wildcard *.c)
 OBJS   = $(patsubst %.c, %.o, $(SOURCES)) 
 
+all: libs
 
-all: $(LIBCOMMON) $(DLIBCOMMON)
+libs: $(LIBCOMMON) $(DLIBCOMMON)
 
 
 #static lib
@@ -25,6 +26,7 @@ $(LIBCOMMON): $(OBJS)
 $(DLIBCOMMON): $(SOURCES)
 	rm -f *.o
 	$(CC) -fPIC -shared $(CFLAGS) $^ -o $@ $(LDFLAGS)
+
 
 #PREFIX is environment variable, but if it is not set, then set default value
 ifeq ($(PREFIX),)
