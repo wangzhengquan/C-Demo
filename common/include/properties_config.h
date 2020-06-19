@@ -1,3 +1,5 @@
+#ifndef __PROPERTIES_CONFIG_H__
+#define __PROPERTIES_CONFIG_H__
 #include "usg_common.h"
 
 class PropertiesConfig {
@@ -9,3 +11,5 @@ public:
 	std::string get(std::string name);
 	int getInt(std::string name);
 };
+
+#endif

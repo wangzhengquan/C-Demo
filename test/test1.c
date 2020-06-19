@@ -1,5 +1,13 @@
-#include <common.h>
+#include <usg_common.h>
 int main() {
 
-	err_msg(3, "hello");
+
+	enum {
+		ALL ,
+		INFO ,
+		WARN ,
+		ERROR ,
+		OFF 
+	};
+	printf("%d, %d\n", ALL, INFO);
 }
