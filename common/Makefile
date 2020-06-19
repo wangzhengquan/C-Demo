@@ -12,10 +12,13 @@ DLIBCOMMON = libusgcommon.so
 SOURCES := $(wildcard *.c)
 OBJS   = $(patsubst %.c, %.o, $(SOURCES)) 
 
-all: libs
+MYLIBS = $(LIBCOMMON)
 
-libs: $(LIBCOMMON) $(DLIBCOMMON)
+all: build
 
+.PHONY: build clean install
+
+build: $(MYLIBS)
 
 #static lib
 $(LIBCOMMON): $(OBJS)
@@ -34,13 +37,14 @@ ifeq ($(PREFIX),)
 endif
 
 # 使用方式： g++ test1.c  -lcommon
-install: $(DLIBCOMMON)
-	sudo install -d $(PREFIX)/lib/
-	sudo install -m 644 $^ $(PREFIX)/lib/
-	sudo install -d $(PREFIX)/include/
-	sudo install -m 644 include/* $(PREFIX)/include/
+install: $(MYLIBS)
+	install -d $(PREFIX)/lib/
+	install -m 644 $^ $(PREFIX)/lib/
+	install -d $(PREFIX)/include/
+	install -m 644 include/* $(PREFIX)/include/
 
 clean:
-	rm -f *.o a.out core temp.* *.a *.so
+	rm -f $(TEMPFILES)
+
 
 # include $(ROOT)/Make.libapue.inc

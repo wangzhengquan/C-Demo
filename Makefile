@@ -1,4 +1,4 @@
-DIRS = common pipe cpp atomic test
+DIRS = common test
 
 all:
 	for i in $(DIRS); do \
