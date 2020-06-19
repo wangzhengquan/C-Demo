@@ -2,7 +2,7 @@
 #include "properties_config.h"
 
 Logger::Logger(std::string cf): configFile(cf) {
-	PropertiesConfig config;
+	PropertiesConfig config(configFile);
 	level = config.getInt("log_level");
 }
 
