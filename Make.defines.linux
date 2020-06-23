@@ -10,7 +10,14 @@ LDFLAGS=
 LDDIR += -L$(ROOT)/common
 LDLIBS += $(LDDIR) -lusgcommon $(EXTRALIBS)
 INCLUDE += -I. -I./include -I$(ROOT)/include -I$(ROOT)/common/include
-CFLAGS += $(INCLUDE)  -g -std=c++11 -Wall -DLINUX -D_GNU_SOURCE $(EXTRA)
+
+ifeq ($(DEBUG),y)
+  DEBFLAGS = -O -g # "-O" is needed to expand inlines
+else
+  DEBFLAGS = -O2
+endif
+
+CFLAGS += $(INCLUDE)  $(DEBFLAGS) -std=c++11 -Wall -DLINUX -D_GNU_SOURCE $(EXTRA)
 RANLIB=echo
 AR=ar
 AWK=awk
