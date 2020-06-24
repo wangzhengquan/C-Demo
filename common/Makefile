@@ -15,8 +15,7 @@ OBJS   = $(patsubst %.c, %.o, $(SOURCES))
 MYLIBS = $(LIBCOMMON)
 
 all: build
-
-.PHONY: build clean install
+ 
 
 build: $(MYLIBS)
 
@@ -46,5 +45,5 @@ install: $(MYLIBS)
 clean:
 	rm -f $(TEMPFILES)
 
-
+.PHONY: build clean install
 # include $(ROOT)/Make.libapue.inc
