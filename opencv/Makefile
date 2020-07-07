@@ -2,27 +2,26 @@
 # Makefile for common library.
 #
 ROOT=..
-LDLIBS+=-Wl,-rpath=$(ROOT)/common:$(ROOT)/lib/jsoncpp
+#LDLIBS+=-Wl,-rpath=$(ROOT)/common:$(ROOT)/lib/jsoncpp
 # 开源工具包路径
-LDDIR += -L$(ROOT)/lib/jsoncpp -L$(ROOT)/lib/nng
+#LDDIR += -L$(ROOT)/lib/jsoncpp -L$(ROOT)/lib/nng
 
 # 开源工具包
 LDLIBS += -ljsoncpp  -lnng  -lpthread
 
-INCLUDE += -I$(ROOT)/device/include
+#INCLUDE += -I$(ROOT)/device/include
 
 PLATFORM=$(shell $(ROOT)/systype.sh)
 include $(ROOT)/Make.defines.$(PLATFORM)
 
  
-PROGS = netdisk_service 
+PROGS = 
 
 
 build: $(PROGS)
 
 
-netdisk_service: $(ROOT)/device/hcnetdisk.c $(ROOT)/device/netdisk_factory.c login_store.c request_handler.c properties_config.c
-
+ 
 
 clean:
 	rm -f $(TEMPFILES) $(PROGS)

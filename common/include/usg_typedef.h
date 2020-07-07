@@ -5,10 +5,6 @@
 extern "C" {
 #endif
 
-/// @brief Compare And Swap
-///        If the current value of *a_ptr is a_oldVal, then write a_newVal into *a_ptr
-/// @return true if the comparison is successful and a_newVal was written
-#define CAS(a_ptr, a_oldVal, a_newVal) __sync_bool_compare_and_swap(a_ptr, a_oldVal, a_newVal)
 
 #if ! defined(__FreeBSD__) && ! defined(__OpenBSD__) && \
                 ! defined(__sgi) && ! defined(__APPLE__)

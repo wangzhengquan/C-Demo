@@ -39,8 +39,8 @@ endif
 install: $(MYLIBS)
 	install -d $(PREFIX)/lib/
 	install -m 644 $^ $(PREFIX)/lib/
-	install -d $(PREFIX)/include/
-	install -m 644 include/* $(PREFIX)/include/
+	install -d $(PREFIX)/include/usgcommon
+	install -m 644 include/* $(PREFIX)/include/usgcommon
 
 clean:
 	rm -f $(TEMPFILES)
