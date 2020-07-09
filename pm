@@ -15,6 +15,7 @@ function create(){
 	cp -a Make* ${mpath} && cp systype.sh  ${mpath}
 	cp -a template ${mpath}
 	cp -a lib ${mpath} && cp -a include ${mpath}
+  cp -a .gitignore ${mpath}
 
 }
 

@@ -43,6 +43,7 @@ extern "C" {
  * define int8_t uint8_t int16_t uint16_t int32_t uint32_t int64_t uint64_t
 */
 #include <stdint.h>
+#include <assert.h>
 
 #ifdef __cplusplus
 }
@@ -56,6 +57,7 @@ extern "C" {
  
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <string>
 #include <cstdlib>
 #include <atomic>
