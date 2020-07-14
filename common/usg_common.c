@@ -73,7 +73,7 @@ static void err_doit(int error, const char *fmt, va_list ap)
 	}
 	strcat(buf, "\n");
 	fflush(stdout);		/* in case stdout and stderr are the same */
-	fputs(buf, stderr);
+	fputs(buf, stderr); //stderr
 	fflush(NULL);		/* flushes all stdio output streams */
 }
 

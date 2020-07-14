@@ -12,7 +12,8 @@ DLIBCOMMON = libusgcommon.so
 SOURCES := $(wildcard *.c)
 OBJS   = $(patsubst %.c, %.o, $(SOURCES)) 
 
-MYLIBS = $(LIBCOMMON)
+MYLIBS = $(LIBCOMMON) $(DLIBCOMMON)
+
 
 all: build
  

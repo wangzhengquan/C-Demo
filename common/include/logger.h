@@ -14,7 +14,7 @@ class Logger {
 		vsnprintf(buf, MAXBUF-1, fmt, ap);
 		strcat(buf, "\n");
 		fflush(stdout);		/* in case stdout and stderr are the same */
-		fputs(buf, stderr);
+		fputs(buf, stdout);
 		fflush(NULL);		/* flushes all stdio output streams */
 	}
 public:
