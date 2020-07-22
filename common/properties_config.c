@@ -6,7 +6,7 @@ PropertiesConfig::PropertiesConfig(std::string __propertiesFile) : propertiesFil
 	char line[1024];
 	//std::string line;
 	char *key, *value;
-    const char *delim = "=";
+  const char *delim = "=";
 	while(fin.getline(line, 1024)) {
 		// printf("line=%s\n", line);
 		if(strlen(trim(line, NULL))== 0)
