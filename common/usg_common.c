@@ -70,6 +70,9 @@ static void err_doit(int error, const char *fmt, va_list ap) {
 }
 
 char *ltrim(char *str, const char *seps) {
+  if(str == NULL) {
+    return str;
+  }
   size_t totrim;
   if (seps == NULL) {
     seps = "\t\n\v\f\r ";
@@ -87,6 +90,9 @@ char *ltrim(char *str, const char *seps) {
 }
 
 char *rtrim(char *str, const char *seps) {
+  if(str == NULL) {
+    return str;
+  }
   int i;
   if (seps == NULL) {
     seps = "\t\n\v\f\r ";
@@ -100,5 +106,8 @@ char *rtrim(char *str, const char *seps) {
 }
 
 char *trim(char *str, const char *seps) {
+  if(str == NULL) {
+    return str;
+  }
   return ltrim(rtrim(str, seps), seps);
 }

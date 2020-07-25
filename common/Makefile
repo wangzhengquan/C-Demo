@@ -14,6 +14,11 @@ OBJS   = $(patsubst %.c, %.o, $(SOURCES))
 
 MYLIBS = $(LIBCOMMON) $(DLIBCOMMON)
 
+ifeq ($(DEBUG),y)
+  MYLIBS = $(LIBCOMMON)
+else
+  MYLIBS = $(LIBCOMMON) $(DLIBCOMMON)
+endif
 
 all: build
  
