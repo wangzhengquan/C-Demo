@@ -30,4 +30,10 @@
 *.app
 *.tar
 *.tar.gz
+
 .vscode/
+.idea
+build/
+*.tmp
+*.txt
+core

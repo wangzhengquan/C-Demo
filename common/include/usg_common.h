@@ -71,6 +71,8 @@ extern "C" {
 #include <map>
 #include <set>
 
+#include <functional>
+
 #include <thread>
  
 #endif
