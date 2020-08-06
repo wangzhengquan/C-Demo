@@ -2,14 +2,14 @@
 
 # Definitions required in all program directories to compile and link
 # C programs using gcc.
-
+DEST=$(ROOT)/build
 CC = g++
 COMPILE.c = $(CC) $(CFLAGS) $(CPPFLAGS) -c
 LINK.c = $(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS)
-LDFLAGS=
-LDDIR += -L$(ROOT)/common
-LDLIBS += $(LDDIR) -lusgcommon $(EXTRALIBS)
-INCLUDE += -I. -I./include -I$(ROOT)/include -I$(ROOT)/common/include
+# LDFLAGS =
+# LDDIR =
+LDLIBS += $(LDDIR)  $(EXTRALIBS)
+INCLUDE += -I. -I./include -I$(ROOT)/include
 
 ifeq ($(DEBUG),y)
   DEBFLAGS = -O -g # "-O" is needed to expand inlines
@@ -27,5 +27,3 @@ LIBCOMMON=$(ROOT)/common/libusgcommon.a
 # Common temp files to delete from each directory.
 TEMPFILES=core core.* *.o temp.* *.out *.a *.so
 
-%:	%.c $(LIBCOMMON)
-	$(CC) $(CFLAGS) $(filter-out $(LIBCOMMON), $^) -o $@ $(LDFLAGS) $(LDLIBS)

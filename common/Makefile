@@ -5,12 +5,13 @@ ROOT=..
 
 PLATFORM=$(shell $(ROOT)/systype.sh)
 include $(ROOT)/Make.defines.$(PLATFORM)
-  
-LIBCOMMON = libusgcommon.a
-DLIBCOMMON = libusgcommon.so
+
+PREFIX = ${DEST}
+LIBCOMMON = $(DEST)/libusgcommon.a
+DLIBCOMMON = $(DEST)/libusgcommon.so
 
 SOURCES := $(wildcard *.c)
-OBJS   = $(patsubst %.c, %.o, $(SOURCES)) 
+OBJS   = $(patsubst %.c, $(DEST)/%.o, $(SOURCES)) 
 
 MYLIBS = $(LIBCOMMON) $(DLIBCOMMON)
 
@@ -53,3 +54,7 @@ clean:
 
 .PHONY: build clean install
 # include $(ROOT)/Make.libapue.inc
+
+
+$(DEST)/%.o:	%.c
+	$(CC) $(CFLAGS) -c $^ -o $@ $(LDFLAGS) $(LDLIBS)
