@@ -16,6 +16,7 @@ function create(){
 	cp -a template ${mpath}
 	cp -a lib ${mpath} && cp -a include ${mpath}
   cp -a .gitignore ${mpath}
+  echo "${mpath}: create success !"
 
 }
 
