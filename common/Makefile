@@ -38,13 +38,13 @@ prebuild:
 
 #static lib
 $(LIBCOMMON): $(OBJS)
-	$(AR) rv $@ $?
-	$(RANLIB) $@
+	@$(AR) rv $@ $?
+	@$(RANLIB) $@
 
 #dynamic lib
 $(DLIBCOMMON): $(SOURCES)
 	rm -f *.o
-	$(CC) -fPIC -shared $(CFLAGS) $^ -o $@ $(LDFLAGS)
+	$(CC) -fPIC -shared ${CPPFLAGS} $(CFLAGS) $^ -o $@ $(LDFLAGS)
 
 
 
@@ -64,7 +64,8 @@ uninstall:
 
 .PHONY: clean
 clean:
+	rm -rf ${DEST}
 	rm -f $(TEMPFILES)
 
 $(DEST)/%.o:	%.c
-	$(CC) $(CFLAGS) -c $^ -o $@ $(LDFLAGS) $(LDLIBS)
+	$(CC) ${CPPFLAGS} $(CFLAGS) -c $^ -o $@ $(LDFLAGS) $(LDLIBS)

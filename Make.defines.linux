@@ -4,7 +4,7 @@
 # C programs using gcc.
 DEST=$(ROOT)/build
 CC = g++
-COMPILE.c = $(CC) $(CFLAGS) $(CPPFLAGS) -c
+COMPILE.c = $(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
 LINK.c = $(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS)
 # LDFLAGS =
 # LDDIR =
@@ -17,7 +17,10 @@ else
   DEBFLAGS = -O2
 endif
 
-CFLAGS += $(INCLUDE)  $(DEBFLAGS) -std=c++11 -Wall -DLINUX -D_GNU_SOURCE $(EXTRA)
+# preprocessor options 
+CPPFLAGS += $(INCLUDE)
+# compilation options
+CFLAGS += $(DEBFLAGS) -std=c++11 -Wall -DLINUX -D_GNU_SOURCE $(EXTRA)
 RANLIB=echo
 AR=ar
 AWK=awk
