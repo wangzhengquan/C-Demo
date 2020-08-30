@@ -40,3 +40,6 @@ clean:
 
 -include $(DEPENDENCES)
 include $(ROOT)/Make.common.inc
+
+$(LIBCOMMON):
+	(cd $(ROOT)/common && $(MAKE))

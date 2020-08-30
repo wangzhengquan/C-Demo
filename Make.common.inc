@@ -13,6 +13,8 @@ help:
 
 
 $(DEST)/%.d: %.c
+	@echo "generating dependences..."
+	test -d ${DEST} || mkdir ${DEST}; \
 	$(CC) -M $(CPPFLAGS) $< > $@.$$$$;                      \
 	sed 's,\($*\)\.o[ :]*,$(DEST)/\1 $(DEST)/\1.o $@ : ,g' < $@.$$$$ > $@;     \
 	rm -f $@.$$$$
@@ -28,5 +30,3 @@ ${DEST}/%:	%.c
 	$(CC) ${CPPFLAGS} $(CFLAGS) $(filter %.c, $^) -o $@ $(LDFLAGS) $(LDLIBS)
 
 
-# $(LIBCOMMON):
-#	(cd $(ROOT)/common && $(MAKE))
