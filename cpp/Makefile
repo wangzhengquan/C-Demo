@@ -9,7 +9,7 @@ LDDIR += -L${DEST}
 # 开源工具包
 LDLIBS += -lusgcommon
 
-INCLUDES += -I${DEST}/include
+INCLUDES += -Icommon/include
 
 
 PROGS =	${DEST}/usestock1 ${DEST}/usetime3 ${DEST}/usebrass2 ${DEST}/vegnews ${DEST}/stdmove ${DEST}/typecast
@@ -41,5 +41,6 @@ clean:
 -include $(DEPENDENCES)
 include $(ROOT)/Make.common.inc
 
+LIBCOMMON=$(DEST)/libusgcommon.a
 $(LIBCOMMON):
 	(cd $(ROOT)/common && $(MAKE))

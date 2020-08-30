@@ -1,6 +1,3 @@
-
-
-# help - The default goal
 .PHONY: help
 help:
 	@make --print-data-base --question no-such-target | \
@@ -13,8 +10,8 @@ help:
 
 
 $(DEST)/%.d: %.c
-	@echo "generating dependences..."
-	test -d ${DEST} || mkdir ${DEST}; \
+	@echo 'generating dependences of '$<' ...'
+	@test -d ${DEST} || mkdir ${DEST}; \
 	$(CC) -M $(CPPFLAGS) $< > $@.$$$$;                      \
 	sed 's,\($*\)\.o[ :]*,$(DEST)/\1 $(DEST)/\1.o $@ : ,g' < $@.$$$$ > $@;     \
 	rm -f $@.$$$$
@@ -24,9 +21,9 @@ $(DEST)/%.o: %.c
 
 
 ${DEST}/%:	%.o
-	$(CC) $(filter %.o, $^) -o $@ $(LDFLAGS) $(LDLIBS)
+	$(CC) $(LDFLAGS) $(filter %.o, $^) -o $@ $(LDLIBS)
 
 ${DEST}/%:	%.c
-	$(CC) ${CPPFLAGS} $(CFLAGS) $(filter %.c, $^) -o $@ $(LDFLAGS) $(LDLIBS)
+	$(CC) ${CPPFLAGS} $(CFLAGS) $(LDFLAGS) $(filter %.c, $^) -o $@ $(LDLIBS)
 
 

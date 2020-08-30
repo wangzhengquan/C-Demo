@@ -18,10 +18,6 @@ LDFLAGS +=
 LDDIR += -L$(ROOT)/lib
 LDLIBS += $(RPATH) $(LDDIR) $(EXTRALIBS)
 
-RANLIB=echo
-AR=ar
-AWK=awk
-
 
 DEST=$(ROOT)/build
 
@@ -34,7 +30,11 @@ else
 endif
 
 
-LIBCOMMON=$(ROOT)/common/libusgcommon.a
+
+RANLIB=echo
+AR=ar
+AWK=awk
+
 # Common temp files to delete from each directory.
 TEMPFILES=core core.* *.o temp.* *.out *.a *.so
 

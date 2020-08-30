@@ -43,8 +43,7 @@ $(LIBCOMMON): $(OBJS)
 
 #dynamic lib
 $(DLIBCOMMON): $(SOURCES)
-	@rm -f *.o
-	$(CC) -fPIC -shared ${CPPFLAGS} $(CFLAGS) $^ -o $@ $(LDFLAGS)
+	$(CC) -fPIC -shared ${CPPFLAGS} $(CFLAGS) $(LDFLAGS) $^ -o $@
 
 
 
@@ -64,8 +63,8 @@ uninstall:
 
 .PHONY: clean
 clean:
-	rm -rf ${DEST}
-	rm -f $(TEMPFILES)
+	rm -f $(OBJS) $(MYLIBS) $(DEPENDENCES) $(TEMPFILES)
+
 
 -include $(DEPENDENCES)
 include $(ROOT)/Make.common.inc
