@@ -1,8 +1,7 @@
 #
 # Makefile for common library.
 #
-ROOT=..
-
+ROOT := ..
 PLATFORM=$(shell $(ROOT)/systype.sh)
 include $(ROOT)/Make.defines.$(PLATFORM)
 
@@ -34,7 +33,7 @@ build: prebuild $(MYLIBS)
 
 .PHONY: prebuild
 prebuild:
-	test -d ${DEST} || mkdir ${DEST}
+	@test -d ${DEST} || mkdir ${DEST}
 
 #static lib
 $(LIBCOMMON): $(OBJS)
@@ -43,7 +42,7 @@ $(LIBCOMMON): $(OBJS)
 
 #dynamic lib
 $(DLIBCOMMON): $(SOURCES)
-	rm -f *.o
+	@rm -f *.o
 	$(CC) -fPIC -shared ${CPPFLAGS} $(CFLAGS) $^ -o $@ $(LDFLAGS)
 
 
@@ -67,5 +66,5 @@ clean:
 	rm -rf ${DEST}
 	rm -f $(TEMPFILES)
 
-$(DEST)/%.o:	%.c
-	$(CC) ${CPPFLAGS} $(CFLAGS) -c $^ -o $@ $(LDFLAGS) $(LDLIBS)
+
+include $(ROOT)/Make.common.inc

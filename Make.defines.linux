@@ -2,31 +2,39 @@
 
 # Definitions required in all program directories to compile and link
 # C programs using gcc.
-DEST=$(ROOT)/build
-CC = g++
-COMPILE.c = $(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
-LINK.c = $(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS)
-# LDFLAGS =
-# LDDIR =
-LDLIBS += $(LDDIR)  $(EXTRALIBS)
-INCLUDE += -I. -I./include -I$(ROOT)/include
 
-ifeq ($(DEBUG),y)
-  DEBFLAGS = -O -g # "-O" is needed to expand inlines
-else
-  DEBFLAGS = -O2
-endif
+CC = g++
+# COMPILE.c = $(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
+# LINK.c = $(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH)
 
 # preprocessor options 
-CPPFLAGS += $(INCLUDE)
+CPPFLAGS += $(INCLUDES) -std=c++11 
 # compilation options
-CFLAGS += $(DEBFLAGS) -std=c++11 -Wall -DLINUX -D_GNU_SOURCE $(EXTRA)
+CFLAGS += $(DEBUGFLAGS) -Wall -DLINUX -D_GNU_SOURCE $(EXTRA)
+# linked options
+LDFLAGS +=
+
+
+LDDIR += -L$(ROOT)/lib
+LDLIBS += $(RPATH) $(LDDIR) $(EXTRALIBS)
+
 RANLIB=echo
 AR=ar
 AWK=awk
+
+
+DEST=$(ROOT)/build
+
+INCLUDES += -I. -I./include -I$(ROOT)/include
+
+ifeq ($(DEBUG),y)
+  DEBUGFLAGS = -O -g # "-O" is needed to expand inlines
+else
+  DEBUGFLAGS = -O2
+endif
+
+
 LIBCOMMON=$(ROOT)/common/libusgcommon.a
-
-
 # Common temp files to delete from each directory.
 TEMPFILES=core core.* *.o temp.* *.out *.a *.so
 

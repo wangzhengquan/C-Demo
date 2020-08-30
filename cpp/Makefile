@@ -1,15 +1,15 @@
-ROOT=..
+ROOT := ..
 PLATFORM=$(shell $(ROOT)/systype.sh)
 include $(ROOT)/Make.defines.$(PLATFORM)
 
-LDLIBS+=-Wl,-rpath=${DEST}/lib
+RPATH += -Wl,-rpath=${DEST}
 # 开源工具包路径
-LDDIR += -L${DEST}/lib
+LDDIR += -L${DEST}
 
 # 开源工具包
 LDLIBS += -lusgcommon
 
-INCLUDE += -I${DEST}/include
+INCLUDES += -I${DEST}/include
 
 PROGS =	${DEST}/usestock1 ${DEST}/usetime3 ${DEST}/usebrass2 ${DEST}/vegnews ${DEST}/stdmove ${DEST}/typecast
 
@@ -35,7 +35,5 @@ ${DEST}/typecast: typecast.c
 clean:
 	rm -f $(PROGS) $(TEMPFILES)
 
-${DEST}/%:	%.c
-	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS) $(LDLIBS)
 
 include $(ROOT)/Make.common.inc
