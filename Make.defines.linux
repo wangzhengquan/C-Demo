@@ -18,10 +18,10 @@ LDFLAGS +=
 LDDIR += -L$(ROOT)/lib
 LDLIBS += $(RPATH) $(LDDIR) $(EXTRALIBS)
 
+INCLUDES += -I. -I./include -I$(ROOT)/include
 
 DEST=$(ROOT)/build
 
-INCLUDES += -I. -I./include -I$(ROOT)/include
 
 ifeq ($(DEBUG),y)
   DEBUGFLAGS = -O -g # "-O" is needed to expand inlines
