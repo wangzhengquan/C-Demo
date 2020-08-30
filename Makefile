@@ -1,3 +1,4 @@
+# debug "make --just-print"
 DIRS = common
 
 all:
