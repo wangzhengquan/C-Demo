@@ -11,6 +11,7 @@ DLIBCOMMON = $(DEST)/libusgcommon.so
 
 SOURCES := $(wildcard *.c)
 OBJS   = $(patsubst %.c, $(DEST)/%.o, $(SOURCES)) 
+DEPENDENCES = $(patsubst %.c, $(DEST)/%.d, $(SOURCES)) 
 
 MYLIBS = $(LIBCOMMON) $(DLIBCOMMON)
 
@@ -66,5 +67,5 @@ clean:
 	rm -rf ${DEST}
 	rm -f $(TEMPFILES)
 
-
+-include $(DEPENDENCES)
 include $(ROOT)/Make.common.inc

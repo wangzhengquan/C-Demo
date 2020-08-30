@@ -10,19 +10,23 @@ help:
 	sort |                                              \
 	pr --omit-pagination --width=80 --columns=4         \
 
-include $(patsubst %.c, $(DEST)/%.d, $(SOURCES)) 
+
 
 $(DEST)/%.d: %.c
 	$(CC) -M $(CPPFLAGS) $< > $@.$$$$;                      \
-	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@;     \
+	sed 's,\($*\)\.o[ :]*,$(DEST)/\1 $(DEST)/\1.o $@ : ,g' < $@.$$$$ > $@;     \
 	rm -f $@.$$$$
 
 $(DEST)/%.o: %.c
-	$(CC) ${CPPFLAGS} $(CFLAGS) -c $^ -o $@
+	$(CC) ${CPPFLAGS} $(CFLAGS) -c $(filter %.c, $^) -o $@
 
+
+${DEST}/%:	%.o
+	$(CC) $(filter %.o, $^) -o $@ $(LDFLAGS) $(LDLIBS)
 
 ${DEST}/%:	%.c
-	$(CC) ${CPPFLAGS} $(CFLAGS) $^ -o $@ $(LDFLAGS) $(LDLIBS)
+	$(CC) ${CPPFLAGS} $(CFLAGS) $(filter %.c, $^) -o $@ $(LDFLAGS) $(LDLIBS)
+
 
 # $(LIBCOMMON):
 #	(cd $(ROOT)/common && $(MAKE))
