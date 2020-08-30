@@ -5,7 +5,7 @@ ROOT := ..
 PLATFORM=$(shell $(ROOT)/systype.sh)
 include $(ROOT)/Make.defines.$(PLATFORM)
 
-PREFIX = ${DEST}
+PREFIX = $(DEST)
 LIBCOMMON = $(DEST)/libusgcommon.a
 DLIBCOMMON = $(DEST)/libusgcommon.so
 
@@ -34,22 +34,26 @@ build: prebuild $(MYLIBS)
 
 .PHONY: prebuild
 prebuild:
-	@test -d ${DEST} || mkdir ${DEST}
+	@echo '>>>>>>' building ...
+	@test -d $(DEST) || mkdir $(DEST)
 
 #static lib
 $(LIBCOMMON): $(OBJS)
+	@echo '>>>>>>' generating $@ ...
 	@$(AR) rv $@ $?
 	@$(RANLIB) $@
 
 #dynamic lib
 $(DLIBCOMMON): $(SOURCES)
-	$(CC) -fPIC -shared ${CPPFLAGS} $(CFLAGS) $(LDFLAGS) $^ -o $@
+	@echo '>>>>>>' generating $@ ...
+	$(CC) -fPIC -shared $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) $^ -o $@
 
 
 
 # 使用方式： g++ test1.c  -lcommon
 .PHONY: install
 install: $(MYLIBS)
+	@echo '>>>>>>' installing $^ ...
 	install -d $(PREFIX)/lib/
 	install -m 644 $^ $(PREFIX)/lib/
 	install -d $(PREFIX)/include/usgcommon
@@ -57,6 +61,7 @@ install: $(MYLIBS)
 
 .PHONY: uninstall
 uninstall:
+	@echo '>>>>>>' uninstalling ...
 	rm -rf $(PREFIX)/include/usgcommon
 	rm -f $(PREFIX)/lib/libusgcommon.*
 
