@@ -1,31 +1,36 @@
-ROOT=..
+ROOT := ..
 PLATFORM=$(shell $(ROOT)/systype.sh)
 include $(ROOT)/Make.defines.$(PLATFORM)
 
-LDLIBS+=-Wl,-rpath=${ROOT}/lib
+#RPATH += -Wl,-rpath=${ROOT}/lib
 # 开源工具包路径
-LDDIR += -L${ROOT}/lib
+#LDDIR += -L${ROOT}/lib
 
 # 开源工具包
 LDLIBS += -lusgcommon
 
-INCLUDE += -I${ROOT}/include/usgcommon
+INCLUDES += -I$(ROOT)/include/usgcommon
 
-PROGS =	${DEST}/clone1 ${DEST}/clone_user ${DEST}/getopt_long
 
-default: build
+PROGS =	$(DEST)/kucker
 
-build: ${PROGS}
-	test -d ${DEST} || mkdir ${DEST}
+DEPENDENCES = $(patsubst %, %.d, $(PROGS)) 
+
+LIBCOMMON=${ROOT}/lib/libusgcommon.a
+
+all:	$(LIBCOMMON) $(PROGS)
 
 # class
-${DEST}/clone1: clone1.c
+$(DEST)/kucker : kucker.c
 
 
 clean:
-	rm -f $(PROGS) $(TEMPFILES)
+	rm -f $(PROGS) $(DEPENDENCES) $(TEMPFILES)
 
-${DEST}/%:	%.c
-	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS) $(LDLIBS)
+$(LIBCOMMON):
+	@(cd $(ROOT)/common && $(MAKE))
 
-# include $(ROOT)/Make.common.inc
+-include $(DEPENDENCES)
+include $(ROOT)/Make.common.inc
+
+
