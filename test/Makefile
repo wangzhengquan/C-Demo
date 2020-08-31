@@ -1,16 +1,25 @@
 ROOT=..
-LDLIBS+=-Wl,-rpath=$(ROOT)/common
-
 PLATFORM=$(shell $(ROOT)/systype.sh)
 include $(ROOT)/Make.defines.$(PLATFORM)
 
-PROGS =	 test_properties_config test_logger
+#LDLIBS+=-Wl,-rpath=${DEST}/lib
+# 开源工具包路径
+LDDIR += -L${DEST}/lib
 
-build: $(PROGS)
+# 开源工具包
+LDLIBS += -lusgcommon
 
-test_properties_config: test_properties_config.c
+INCLUDE += -I${DEST}/include -I${DEST}/include/usgcommon
+
+PROGS =	${DEST}/test_strjoin
+
+all:	${PROGS}
+ 
 
 clean:
 	rm -f $(PROGS) $(TEMPFILES)
+
+${DEST}/%:	%.c
+	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS) $(LDLIBS)
 
 include $(ROOT)/Make.common.inc

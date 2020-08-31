@@ -1,13 +1,6 @@
-#include <usg_common.h>
+#include <stdio.h>
+#include <string.h>
 int main() {
-
-
-	enum {
-		ALL ,
-		INFO ,
-		WARN ,
-		ERROR ,
-		OFF 
-	};
-	printf("%d, %d\n", ALL, INFO);
+ 	int len = strspn("geek for you", "you");
+ 	printf("%d\n", len);
 }

@@ -1,10 +1,12 @@
 #include "usg_common.h"
 #include <errno.h> /* for definition of errno */
 
-#define MAXLINE 4096 /* max line length */
-                     /**************************
-                      * Error-handling functions
-                      **************************/
+
+#ifdef _WIN32
+#define PATH_SEPERATOR   "\\"
+#else
+#define PATH_SEPERATOR   "/"
+#endif
 
 static void err_doit(int, const char *, va_list);
 
@@ -111,3 +113,125 @@ char *trim(char *str, const char *seps) {
   }
   return ltrim(rtrim(str, seps), seps);
 }
+
+
+
+
+/*
+ * Join `dir` with `file`
+ */
+char * str_join( const char *seperator, const size_t n, char *first...) {
+    size_t i, len, size = 1024;
+    va_list vl;
+    char *str, *buf;
+
+    len = strlen(first);
+    if(len >= size ) {
+      size = len * 2;
+    }
+    buf = (char *)malloc(size);
+    if (NULL == buf) return NULL;
+    strcpy(buf, first);
+
+    va_start(vl, first);
+    i = 1;
+    while(i < n) {
+      str = va_arg(vl, char *);
+      len += strlen(seperator);
+      if(len >= size ) {
+        size = len * 2;
+        buf = (char *)realloc(buf, size);
+      }
+      strcat(buf,  seperator);
+      len += strlen(str);
+      if(len >= size ) {
+        size = len * 2;
+        buf = (char *)realloc(buf, size);
+      }
+      strcat(buf,  str);
+      i++;
+    }
+    va_end(vl);
+    buf[len] = '\0';
+    return buf;
+}
+
+
+// char * str_join2(const char *arr[], const char *seperator) {
+
+//   int size = 0, i = 0, c = 0;
+
+//   while(1) {
+//     if(arr[c] == NULL) {
+//       break;
+//     }
+//     size += strlen(arr[c]);
+//     c++;
+//   }
+//   char *buf = (char *)malloc(size + strlen(seperator) * (c-1) + 1);
+//   if (NULL == buf) return NULL;
+
+//   i = 0;
+//   while(1) {
+//     if(arr[i] == NULL) {
+//       break;
+//     }
+//     if(i != 0) {
+//       strcat(buf,  seperator);
+//     }
+//     strcat(buf,  arr[i]);
+//     i++;
+//   }
+
+//   return buf;
+ 
+// }
+
+
+
+char * path_join(const size_t n, char *path, ...) {
+  size_t i, spn, len, size = 1024;
+  va_list vl;
+  char *str;
+  len = strlen(path);
+  if(len >= size ) {
+    size = len * 2;
+  }
+  char *buf = (char *)malloc(size);
+  if (NULL == buf) return NULL;
+  strcpy(buf, path);
+
+  va_start(vl, path);
+  i = 1;
+  while(i < n) {
+    str = va_arg(vl, char *);
+
+    if(strcmp(buf+len-strlen(PATH_SEPERATOR), PATH_SEPERATOR) == 0) {
+      len -= strlen(PATH_SEPERATOR);
+      *(buf+len) = '\0';
+    }
+   
+    if( (spn = strspn(str, PATH_SEPERATOR)) > 0 ) {
+      str = str + spn;
+    }
+
+    len += strlen(PATH_SEPERATOR);
+    if(len >= size ) {
+      size = len * 2;
+      buf = (char *)realloc(buf, size);
+    }
+    strcat(buf,  PATH_SEPERATOR);
+
+    len += strlen(str);
+    if(len >= size ) {
+      size = len * 2;
+      buf = (char *)realloc(buf, size);
+    }
+    strcat(buf,  str);
+    i++;
+  }
+  va_end(vl);
+  buf[len] = '\0';
+  return buf;
+}
+

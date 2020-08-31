@@ -1,31 +1,31 @@
-#
-# Makefile for common library.
-#
 ROOT=..
-LDLIBS+=-Wl,-rpath=$(ROOT)/common:$(ROOT)/lib/jsoncpp
-# 开源工具包路径
-LDDIR += -L$(ROOT)/lib/jsoncpp -L$(ROOT)/lib/nng
-
-# 开源工具包
-LDLIBS += -ljsoncpp  -lnng  -lpthread
-
-INCLUDE += -I$(ROOT)/device/include
-
 PLATFORM=$(shell $(ROOT)/systype.sh)
 include $(ROOT)/Make.defines.$(PLATFORM)
 
- 
-PROGS = netdisk_service 
+LDLIBS+=-Wl,-rpath=${ROOT}/lib
+# 开源工具包路径
+LDDIR += -L${ROOT}/lib
 
+# 开源工具包
+LDLIBS += -lusgcommon
 
-build: $(PROGS)
+INCLUDE += -I${ROOT}/include/usgcommon
 
+PROGS =	${DEST}/clone1 ${DEST}/clone_user ${DEST}/getopt_long
 
-netdisk_service: $(ROOT)/device/hcnetdisk.c $(ROOT)/device/netdisk_factory.c login_store.c request_handler.c properties_config.c
+default: build
+
+build: ${PROGS}
+	test -d ${DEST} || mkdir ${DEST}
+
+# class
+${DEST}/clone1: clone1.c
 
 
 clean:
-	rm -f $(TEMPFILES) $(PROGS)
+	rm -f $(PROGS) $(TEMPFILES)
 
+${DEST}/%:	%.c
+	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS) $(LDLIBS)
 
-include $(ROOT)/Make.common.inc
+# include $(ROOT)/Make.common.inc
