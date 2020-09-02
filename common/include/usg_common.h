@@ -90,8 +90,9 @@ char *ltrim(char *str, const char *seps);
 char *rtrim(char *str, const char *seps);
 char *trim(char *str, const char *seps);
 
-char * str_join( const char *seperator, const size_t n, char *first...);
-char * path_join(const size_t n, char *path, ...);
+char * str_join( const char *seperator, const size_t n, const char *first...);
+char * str_join2(const char *arr[], const size_t len, const char *seperator);
+char * path_join(const size_t n, const char *path, ...);
 
 static inline int 
 itoa(int num, char *str) 

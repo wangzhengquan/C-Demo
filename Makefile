@@ -1,5 +1,5 @@
 # debug "make --just-print"
-DIRS = common cpp
+DIRS = common cpp test
 
 all:
 	@for i in $(DIRS); do \

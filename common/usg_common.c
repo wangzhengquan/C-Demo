@@ -120,7 +120,7 @@ char *trim(char *str, const char *seps) {
 /*
  * Join `dir` with `file`
  */
-char * str_join( const char *seperator, const size_t n, char *first...) {
+char * str_join( const char *seperator, const size_t n, const char *first...) {
     size_t i, len, size = 1024;
     va_list vl;
     char *str, *buf;
@@ -157,39 +157,47 @@ char * str_join( const char *seperator, const size_t n, char *first...) {
 }
 
 
-// char * str_join2(const char *arr[], const char *seperator) {
+char * str_join2(const char *arr[], const size_t len, const char *seperator) {
 
-//   int size = 0, i = 0, c = 0;
+  if(len < 1) {
+    return NULL;
+  }
 
-//   while(1) {
-//     if(arr[c] == NULL) {
-//       break;
-//     }
-//     size += strlen(arr[c]);
-//     c++;
-//   }
-//   char *buf = (char *)malloc(size + strlen(seperator) * (c-1) + 1);
-//   if (NULL == buf) return NULL;
+  size_t size = 0, i = 0;
 
-//   i = 0;
-//   while(1) {
-//     if(arr[i] == NULL) {
-//       break;
-//     }
-//     if(i != 0) {
-//       strcat(buf,  seperator);
-//     }
-//     strcat(buf,  arr[i]);
-//     i++;
-//   }
+  while(i < len) {
+    if(arr[i] == NULL) {
+      i++;
+      continue;
+    }
+    size += strlen(arr[i]);
+    i++;
+  }
+  char *buf = (char *)malloc(size + strlen(seperator) * (len-1) + 1);
+  if (NULL == buf) return NULL;
+  
+  strcpy(buf, arr[0]);
+  
+  i = 1;
+  while(i < len) {
+    if(arr[i] == NULL) {
+      i++;
+      continue;
+    }
+    if(i != 0) {
+      strcat(buf,  seperator);
+    }
+    strcat(buf,  arr[i]);
+    i++;
+  }
 
-//   return buf;
+  return buf;
  
-// }
+}
 
 
 
-char * path_join(const size_t n, char *path, ...) {
+char * path_join(const size_t n, const char *path, ...) {
   size_t i, spn, len, size = 1024;
   va_list vl;
   char *str;

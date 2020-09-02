@@ -1,25 +1,32 @@
-ROOT=..
+ROOT := ..
 PLATFORM=$(shell $(ROOT)/systype.sh)
 include $(ROOT)/Make.defines.$(PLATFORM)
 
-#LDLIBS+=-Wl,-rpath=${DEST}/lib
+#RPATH += -Wl,-rpath=$(DEST)
 # 开源工具包路径
-LDDIR += -L${DEST}/lib
+LDDIR += -L$(DEST)
 
 # 开源工具包
 LDLIBS += -lusgcommon
 
-INCLUDE += -I${DEST}/include -I${DEST}/include/usgcommon
+INCLUDES += -I$(ROOT)/common/include
 
-PROGS =	${DEST}/test_strjoin
 
-all:	${PROGS}
+PROGS =	$(DEST)/test_strjoin
+
+DEPENDENCES = $(patsubst %, %.d, $(PROGS)) 
+
+LIBCOMMON=$(DEST)/libusgcommon.so
+
+all:	$(LIBCOMMON) $(PROGS)
  
 
 clean:
-	rm -f $(PROGS) $(TEMPFILES)
+	rm -f $(PROGS) $(DEPENDENCES) $(TEMPFILES)
 
-${DEST}/%:	%.c
-	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS) $(LDLIBS)
+$(LIBCOMMON):
+	@(cd $(ROOT)/common && $(MAKE))
 
+-include $(DEPENDENCES)
 include $(ROOT)/Make.common.inc
+
