@@ -22,6 +22,7 @@ extern "C" {
 #include <sched.h>
 
 #include <sys/time.h>
+#include <sys/syscall.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/stat.h>
@@ -44,6 +45,7 @@ extern "C" {
 */
 #include <stdint.h>
 #include <assert.h>
+
 
 #ifdef __cplusplus
 }
@@ -91,22 +93,17 @@ char *rtrim(char *str, const char *seps);
 char *trim(char *str, const char *seps);
 
 char * str_join( const char *seperator, const size_t n, const char *first...);
-char * str_join2(const char *arr[], const size_t len, const char *seperator);
+char * str_join2(char * const arr[], const size_t len, const char *seperator);
+size_t str_split(char *str, const char *delim, char ***strarr);
 char * path_join(const size_t n, const char *path, ...);
 
 static inline int 
-itoa(int num, char *str) 
+strtoi(int num, char *str) 
 {
 	return sprintf(str, "%d", num); 
 
 }
 
-static inline int 
-ftoa(float num, char *str) 
-{
-	 return sprintf(str, "%f", num); 
-
-}
 
 
  

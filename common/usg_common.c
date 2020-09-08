@@ -157,7 +157,7 @@ char * str_join( const char *seperator, const size_t n, const char *first...) {
 }
 
 
-char * str_join2(const char *arr[], const size_t len, const char *seperator) {
+char * str_join2(char * const arr[], const size_t len, const char *seperator) {
 
   if(len < 1) {
     return NULL;
@@ -177,7 +177,7 @@ char * str_join2(const char *arr[], const size_t len, const char *seperator) {
   if (NULL == buf) return NULL;
   
   strcpy(buf, arr[0]);
-  
+
   i = 1;
   while(i < len) {
     if(arr[i] == NULL) {
@@ -193,6 +193,44 @@ char * str_join2(const char *arr[], const size_t len, const char *seperator) {
 
   return buf;
  
+}
+
+size_t str_split( char *str, const char *delim, char ***strarr) {
+
+  size_t len = 64;
+  size_t i = 0;
+  char **arr = (char **)calloc(len, sizeof(char *));
+  if(arr == NULL) {
+    perror("str_split calloc");
+    return 0;
+  }
+
+  char *token = strtok(str, delim);
+  while(token) {
+    if(i >= len) {
+      len *= 2 ;
+      arr = (char **)realloc((void*)arr, len * sizeof(char *));
+      if(arr == NULL) {
+        perror("str_split realloc");
+        return 0;
+      }
+    }
+    arr[i] = strdup(token);
+    token = strtok(NULL, delim);
+    i++;
+  }
+
+  if(i >= len) {
+    len += 1 ;
+    arr = (char **)realloc((void*)arr, len * sizeof(char *));
+    if(arr == NULL) {
+      perror("str_split realloc");
+      return 0;
+    }
+  }
+  arr[i] = NULL;
+  *strarr = arr;
+  return i;
 }
 
 

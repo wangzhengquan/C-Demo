@@ -13,12 +13,12 @@ SOURCES := $(wildcard *.c)
 OBJS   = $(patsubst %.c, $(DEST)/%.o, $(SOURCES)) 
 DEPENDENCES = $(patsubst %.c, $(DEST)/%.d, $(SOURCES)) 
 
-MYLIBS = $(LIBCOMMON) $(DLIBCOMMON)
+# MYLIBS = $(LIBCOMMON) $(DLIBCOMMON)
 
 ifeq ($(DEBUG),y)
   MYLIBS = $(LIBCOMMON)
 else
-  MYLIBS = $(LIBCOMMON) $(DLIBCOMMON)
+  MYLIBS = $(LIBCOMMON)
 endif
 
 #PREFIX is environment variable, but if it is not set, then set default value
@@ -34,7 +34,6 @@ build: prebuild $(MYLIBS)
 
 .PHONY: prebuild
 prebuild:
-	@echo '>>>>>>' building ...
 	@test -d $(DEST) || mkdir $(DEST)
 
 #static lib
