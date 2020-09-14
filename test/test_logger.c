@@ -2,11 +2,13 @@
 #include "logger.h"
 using namespace std;
 int main() {
-	// PropertiesConfig config("./config.txt");
-
-	// std::cout << config.get("name") << std::endl;
-	//Logger logger(Logger::WARN);
-	Logger logger("./config.txt");
+	 
+	 
+	// LoggerConfig config;
+	// config.level = 3;
+	// config.logFile = "./1.log";
+	// Logger logger(config);
+	Logger logger("config.txt");
 	logger.debug("debug");
 	logger.log(Logger::INFO, "info %d", Logger::INFO);
 	logger.warn("warn");

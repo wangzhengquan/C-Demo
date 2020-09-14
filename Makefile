@@ -1,5 +1,5 @@
 # debug "make --just-print"
-DIRS = common cpp test
+DIRS = common test
 
 all:
 	@for i in $(DIRS); do \
@@ -7,6 +7,7 @@ all:
 	done
 
 clean:
+	@rm -f $(TEMPFILES)
 	@for i in $(DIRS); do \
 		(cd $$i && echo ">>>>>> cleaning $$i ..." && $(MAKE) clean) || exit 1; \
 	done

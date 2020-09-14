@@ -10,6 +10,23 @@
 
 static void err_doit(int, const char *, va_list);
 
+/************************************
+ * Wrappers for Unix signal functions
+ ***********************************/
+
+/* $begin sigaction */
+handler_t *Signal(int signum, handler_t *handler)
+{
+  struct sigaction action, old_action;
+
+  action.sa_handler = handler;
+  sigemptyset(&action.sa_mask); /* Block sigs of type being handled */
+  action.sa_flags = SA_RESTART; /* Restart syscalls if possible */
+
+  if (sigaction(signum, &action, &old_action) < 0)
+    err_msg(errno, "Signal error");
+  return (old_action.sa_handler);
+}
 /*void unix_error(const char *fmt, ...) */
 /*{*/
 /*va_list		ap;*/
@@ -120,23 +137,27 @@ char *trim(char *str, const char *seps) {
 /*
  * Join `dir` with `file`
  */
-char * str_join( const char *seperator, const size_t n, const char *first...) {
+char * str_join( const char *seperator, const char *first...) {
     size_t i, len, size = 1024;
     va_list vl;
     char *str, *buf;
-
+    if(first == NULL) {
+      return NULL;
+    }
     len = strlen(first);
     if(len >= size ) {
       size = len * 2;
     }
+
     buf = (char *)malloc(size);
     if (NULL == buf) return NULL;
+
     strcpy(buf, first);
 
     va_start(vl, first);
     i = 1;
-    while(i < n) {
-      str = va_arg(vl, char *);
+    while( (str = va_arg(vl, char *) ) != NULL ) {
+      
       len += strlen(seperator);
       if(len >= size ) {
         size = len * 2;
@@ -157,36 +178,29 @@ char * str_join( const char *seperator, const size_t n, const char *first...) {
 }
 
 
-char * str_join2(char * const arr[], const size_t len, const char *seperator) {
+char * array_join(char * const arr[], const char *seperator) {
+  size_t size = 0, i = 0, arr_len = 0;
 
-  if(len < 1) {
-    return NULL;
-  }
-
-  size_t size = 0, i = 0;
-
-  while(i < len) {
-    if(arr[i] == NULL) {
-      i++;
-      continue;
-    }
+  while(arr[i] != NULL) {
     size += strlen(arr[i]);
     i++;
   }
-  char *buf = (char *)malloc(size + strlen(seperator) * (len-1) + 1);
-  if (NULL == buf) return NULL;
+  arr_len = i;
+  if(arr_len == 0 || size == 0) {
+    return NULL;
+  }
+
+  char *buf = (char *)malloc(size + strlen(seperator) * (arr_len-1) + 1);
+  if (NULL == buf) {
+    err_exit(errno, "array_join malloc:");
+    return NULL;
+  }
   
   strcpy(buf, arr[0]);
 
   i = 1;
-  while(i < len) {
-    if(arr[i] == NULL) {
-      i++;
-      continue;
-    }
-    if(i != 0) {
-      strcat(buf,  seperator);
-    }
+  while(i < arr_len) {
+    strcat(buf,  seperator);
     strcat(buf,  arr[i]);
     i++;
   }
@@ -195,62 +209,27 @@ char * str_join2(char * const arr[], const size_t len, const char *seperator) {
  
 }
 
-size_t str_split( char *str, const char *delim, char ***strarr) {
 
-  size_t len = 64;
-  size_t i = 0;
-  char **arr = (char **)calloc(len, sizeof(char *));
-  if(arr == NULL) {
-    perror("str_split calloc");
-    return 0;
-  }
-
-  char *token = strtok(str, delim);
-  while(token) {
-    if(i >= len) {
-      len *= 2 ;
-      arr = (char **)realloc((void*)arr, len * sizeof(char *));
-      if(arr == NULL) {
-        perror("str_split realloc");
-        return 0;
-      }
-    }
-    arr[i] = strdup(token);
-    token = strtok(NULL, delim);
-    i++;
-  }
-
-  if(i >= len) {
-    len += 1 ;
-    arr = (char **)realloc((void*)arr, len * sizeof(char *));
-    if(arr == NULL) {
-      perror("str_split realloc");
-      return 0;
-    }
-  }
-  arr[i] = NULL;
-  *strarr = arr;
-  return i;
-}
-
-
-
-char * path_join(const size_t n, const char *path, ...) {
+char * path_join(const char *path, ...) {
   size_t i, spn, len, size = 1024;
   va_list vl;
   char *str;
+  if(path == NULL) {
+    return NULL;
+  }
+
   len = strlen(path);
   if(len >= size ) {
     size = len * 2;
   }
   char *buf = (char *)malloc(size);
   if (NULL == buf) return NULL;
+
   strcpy(buf, path);
 
   va_start(vl, path);
   i = 1;
-  while(i < n) {
-    str = va_arg(vl, char *);
+  while((str = va_arg(vl, char *)) != NULL) {
 
     if(strcmp(buf+len-strlen(PATH_SEPERATOR), PATH_SEPERATOR) == 0) {
       len -= strlen(PATH_SEPERATOR);
@@ -280,4 +259,51 @@ char * path_join(const size_t n, const char *path, ...) {
   buf[len] = '\0';
   return buf;
 }
+
+char ** str_split( char *str, const char *delim, int *arr_len) {
+
+  size_t len = 64;
+  size_t i = 0;
+  if(str == NULL) {
+
+    return NULL;
+  }
+  char **arr = (char **)calloc(len, sizeof(char *));
+  if(arr == NULL) {
+    err_exit(errno, "str_split calloc");
+    return NULL;
+  }
+
+  char *token = strtok(str, delim);
+  while(token) {
+    if(i >= len) {
+      len *= 2 ;
+      arr = (char **)realloc((void*)arr, len * sizeof(char *));
+      if(arr == NULL) {
+        err_exit(errno, "str_split realloc");
+        return NULL;
+      }
+    }
+    arr[i] = strdup(token);
+    token = strtok(NULL, delim);
+    i++;
+  }
+
+  if(i >= len) {
+    len += 1 ;
+    arr = (char **)realloc((void*)arr, len * sizeof(char *));
+    if(arr == NULL) {
+      err_exit(errno, "str_split realloc");
+      return 0;
+    }
+  }
+  arr[i] = NULL;
+  if(arr_len != NULL) {
+    *arr_len = i;
+  }
+  return arr;
+}
+
+
+
 

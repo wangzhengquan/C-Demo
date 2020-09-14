@@ -26,4 +26,7 @@ ${DEST}/%:	%.o
 ${DEST}/%:	%.c
 	$(CC) ${CPPFLAGS} $(CFLAGS) $(LDFLAGS) $(filter %.c, $^) -o $@ $(LDLIBS)
 
+gdb:
+	gdb -n -x .gdbinit
+
 

@@ -3,6 +3,7 @@ PLATFORM=$(shell $(ROOT)/systype.sh)
 include $(ROOT)/Make.defines.$(PLATFORM)
 
 #RPATH += -Wl,-rpath=$(DEST)
+
 # 开源工具包路径
 LDDIR += -L$(DEST)
 
@@ -12,14 +13,16 @@ LDLIBS += -lusgcommon
 INCLUDES += -I$(ROOT)/common/include
 
 
-PROGS =	$(DEST)/test_strjoin
+PROGS =	$(DEST)/test_logger
 
 DEPENDENCES = $(patsubst %, %.d, $(PROGS)) 
 
 LIBCOMMON=$(DEST)/libusgcommon.so
 
-all:	$(LIBCOMMON) $(PROGS)
- 
+build:	$(LIBCOMMON) $(PROGS)
+
+symbal: build
+	$(NM) -n $(DEST)/test_logger > $(DEST)/test_logger.sym
 
 clean:
 	rm -f $(PROGS) $(DEPENDENCES) $(TEMPFILES)
