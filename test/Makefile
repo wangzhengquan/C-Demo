@@ -20,6 +20,7 @@ DEPENDENCES = $(patsubst %, %.d, $(PROGS))
 LIBCOMMON=$(DEST)/libusgcommon.so
 
 build:	$(LIBCOMMON) $(PROGS)
+	cp config.txt $(DEST)/config.txt
 
 symbal: build
 	$(NM) -n $(DEST)/test_logger > $(DEST)/test_logger.sym

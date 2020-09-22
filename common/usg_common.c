@@ -23,8 +23,10 @@ handler_t *Signal(int signum, handler_t *handler)
   sigemptyset(&action.sa_mask); /* Block sigs of type being handled */
   action.sa_flags = SA_RESTART; /* Restart syscalls if possible */
 
-  if (sigaction(signum, &action, &old_action) < 0)
-    err_msg(errno, "Signal error");
+  if (sigaction(signum, &action, &old_action) < 0){
+    err_msg(errno, "UsgCommon Signal:");
+    return SIG_ERR;
+  }
   return (old_action.sa_handler);
 }
 /*void unix_error(const char *fmt, ...) */
@@ -260,27 +262,28 @@ char * path_join(const char *path, ...) {
   return buf;
 }
 
-char ** str_split( char *str, const char *delim, int *arr_len) {
+char ** str_split( const char *_str, const char *delim, int *arr_len) {
 
   size_t len = 64;
   size_t i = 0;
-  if(str == NULL) {
+  char *token;
+  if(_str == NULL) {
 
     return NULL;
   }
+  char *str = strdup(_str);
   char **arr = (char **)calloc(len, sizeof(char *));
   if(arr == NULL) {
-    err_exit(errno, "str_split calloc");
-    return NULL;
+    goto LABEL_ERROR;
   }
 
-  char *token = strtok(str, delim);
+  token = strtok(str, delim);
   while(token) {
     if(i >= len) {
       len *= 2 ;
       arr = (char **)realloc((void*)arr, len * sizeof(char *));
       if(arr == NULL) {
-        err_exit(errno, "str_split realloc");
+        goto LABEL_ERROR;
         return NULL;
       }
     }
@@ -293,7 +296,7 @@ char ** str_split( char *str, const char *delim, int *arr_len) {
     len += 1 ;
     arr = (char **)realloc((void*)arr, len * sizeof(char *));
     if(arr == NULL) {
-      err_exit(errno, "str_split realloc");
+      goto LABEL_ERROR;
       return 0;
     }
   }
@@ -301,7 +304,13 @@ char ** str_split( char *str, const char *delim, int *arr_len) {
   if(arr_len != NULL) {
     *arr_len = i;
   }
+  free(str);
   return arr;
+
+LABEL_ERROR:
+  free(str);
+  err_exit(errno, "str_split calloc");
+  return NULL;
 }
 
 

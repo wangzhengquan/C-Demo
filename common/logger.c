@@ -1,11 +1,23 @@
 #include "logger.h"
 #include "properties_config.h"
 
+const char *Logger::LOGGER_LEVEL_STR[]  = {"ALL", "DEBUG", "INFO", "WARN", "ERROR", "FATAL", "OFF" };
+
+const char * Logger::strlevel(int level){
+	return LOGGER_LEVEL_STR[level];
+}
+
 Logger::Logger(std::string cf): configFile(cf) {
 	PropertiesConfig properties(configFile);
 	 
+
 	config.level = properties.getInt("log_level");
 	config.logFile = properties.get("log_file");
+	config.console = (bool)properties.getInt("console");
+
+	// std::cout <<  properties.get("log_file") << std::endl;
+	// printf("==log_file=%s\n", properties.get("log_file").c_str());
+	// printf("=console==%d\n", properties.getInt("console"));
 	// new (this)Logger(conf);
 	init();
 }
@@ -16,6 +28,7 @@ Logger::Logger(LoggerConfig & conf): config(conf) {
 
 Logger::Logger(int l) {
 	config.level = l;
+	config.console = true;
 	init();
 }
 
@@ -47,7 +60,7 @@ void Logger::log(int _level,  const char *fmt, ...) {
 
 	va_list		ap;
 	va_start(ap, fmt);
-	dolog(fmt, ap);
+	dolog(fmt, ap, _level);
 	va_end(ap);
 }
 
@@ -57,7 +70,7 @@ void Logger::debug(const char *fmt, ...) {
 
 	va_list		ap;
 	va_start(ap, fmt);
-	dolog(fmt, ap);
+	dolog(fmt, ap, DEBUG);
 	va_end(ap);
 }
 
@@ -67,7 +80,7 @@ void Logger::info(const char *fmt, ...) {
 
 	va_list		ap;
 	va_start(ap, fmt);
-	dolog(fmt, ap);
+	dolog(fmt, ap, INFO);
 	va_end(ap);
 }
 
@@ -77,7 +90,7 @@ void Logger::warn(const char *fmt, ...) {
 
 	va_list		ap;
 	va_start(ap, fmt);
-	dolog(fmt, ap);
+	dolog(fmt, ap, WARN);
 	va_end(ap);
 }
 
@@ -87,7 +100,17 @@ void Logger::error(const char *fmt, ...) {
 
 	va_list		ap;
 	va_start(ap, fmt);
-	dolog(fmt, ap);
+	dolog(fmt, ap, ERROR);
+	va_end(ap);
+}
+
+void Logger::error(int err, const char *fmt, ...) {
+	if(ERROR < config.level)
+		return;
+
+	va_list		ap;
+	va_start(ap, fmt);
+	dolog(fmt, ap, ERROR, err);
 	va_end(ap);
 }
 
@@ -96,6 +119,6 @@ void Logger::fatal(const char *fmt, ...) {
 		return;
 	va_list		ap;
 	va_start(ap, fmt);
-	dolog(fmt, ap);
+	dolog(fmt, ap, FATAL);
 	va_end(ap);
 }
