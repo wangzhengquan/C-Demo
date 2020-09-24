@@ -2,11 +2,7 @@
 #include <errno.h> /* for definition of errno */
 
 
-#ifdef _WIN32
-#define PATH_SEPERATOR   "\\"
-#else
-#define PATH_SEPERATOR   "/"
-#endif
+
 
 static void err_doit(int, const char *, va_list);
 
@@ -311,6 +307,129 @@ LABEL_ERROR:
   free(str);
   err_exit(errno, "str_split calloc");
   return NULL;
+}
+
+
+
+
+char *strstr_r(char *str,  char * needle) {
+  size_t needle_len = strlen(needle);
+  if(str == NULL || needle == NULL) {
+    return NULL;
+  }
+
+  char *start = str ;
+  char *end = str + strlen(str) - needle_len;
+  
+  while(end >= start) {
+    
+    if(strncmp(end, needle, needle_len) == 0) {
+      return end;
+    }
+    end--;
+  }
+
+  return NULL;
+}
+
+int mkdir_r(const char *pathname, mode_t mode) {
+  char *parent;
+  char *parent_end;
+
+  if(access(pathname, F_OK) == 0) {
+    return 0;
+  }
+
+  // 根目录
+  if(strcmp(pathname, PATH_SEPERATOR ) == 0) {
+    if(mkdir(pathname, mode) != 0) {
+      err_msg(errno, "1 usg_common mkdirr");
+      return -1;
+    }
+    
+    return 0;
+  }
+
+  parent = strdup(pathname);
+  
+LABEL_FIND_PARENT:
+  if( (parent_end = strstr_r(parent, PATH_SEPERATOR)) != NULL) {
+    if(parent_end + strlen(PATH_SEPERATOR)  == parent + strlen(parent) ) {
+      *parent_end = '\0';
+      goto LABEL_FIND_PARENT;
+    }
+
+    *parent_end = '\0';
+    if(mkdir_r(parent, mode) == -1) {
+      free(parent);
+      return -1;
+    }
+  } 
+
+  free(parent);
+  
+  if(mkdir(pathname, mode) != 0) {
+    err_msg(errno, "2 usg_common mkdirr %s", pathname);
+    return -1;
+  }
+  
+  return 0;
+}
+
+
+
+int mkdiratfd_r(int dirfd, const char *pathname, mode_t mode) {
+  char *parent;
+  char *parent_end;
+
+  if(faccessat(dirfd, pathname, F_OK, AT_EACCESS) == 0) {
+    return 0;
+  }
+
+  // 根目录
+  if(strcmp(pathname, PATH_SEPERATOR ) == 0) {
+    if(mkdir(pathname, mode) != 0) {
+      err_msg(errno, "1 usg_common mkdirr");
+      return -1;
+    }
+    
+    return 0;
+  }
+
+  parent = strdup(pathname);
+  
+LABEL_FIND_PARENT:
+  if( (parent_end = strstr_r(parent, PATH_SEPERATOR)) != NULL) {
+    if(parent_end + strlen(PATH_SEPERATOR)  == parent + strlen(parent) ) {
+      *parent_end = '\0';
+      goto LABEL_FIND_PARENT;
+    }
+
+    *parent_end = '\0';
+    if(mkdiratfd_r(dirfd, parent, mode) == -1) {
+      free(parent);
+      return -1;
+    }
+  } 
+
+  free(parent);
+  
+  if(mkdirat(dirfd, pathname, mode) != 0) {
+    err_msg(errno, "2 usg_common mkdirr %s", pathname);
+    return -1;
+  }
+  
+  return 0;
+}
+
+int mkdirat_r(const char * dir, const char *pathname, mode_t mode) {
+  DIR * baseDir = opendir(dir);
+  if(baseDir == NULL) {
+    err_msg(errno, "open dir %s", dir);
+    return -1;
+  }
+
+  return mkdiratfd_r(dirfd(baseDir), pathname, DIR_MODE);
 }
 
 
