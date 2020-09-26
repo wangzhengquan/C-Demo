@@ -13,14 +13,13 @@ LDLIBS += -lusgcommon
 INCLUDES += -I$(ROOT)/common/include
 
 
-PROGS =	$(DEST)/test_file
+PROGS =	$(DEST)/broadcast_sender $(DEST)/broadcast_receiver
 
 DEPENDENCES = $(patsubst %, %.d, $(PROGS)) 
 
 LIBCOMMON=$(DEST)/libusgcommon.a
 
 build:	$(LIBCOMMON) $(PROGS)
-	cp config.txt $(DEST)/config.txt
 
 symbal: build
 	$(NM) -n $(DEST)/test_logger > $(DEST)/test_logger.sym

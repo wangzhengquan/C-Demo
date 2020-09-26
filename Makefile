@@ -1,5 +1,5 @@
 # debug "make --just-print"
-DIRS = common test
+DIRS = common test network
 
 all:
 	@for i in $(DIRS); do \
