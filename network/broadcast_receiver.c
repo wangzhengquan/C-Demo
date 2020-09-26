@@ -40,12 +40,16 @@ int main(int argc, char *argv[])
     if (bind(sock, (struct sockaddr *) &broadcastAddr, sizeof(broadcastAddr)) < 0)
         err_msg(errno, "bind() failed");
 
-    /* Receive a single datagram from the server */
-    if ((recvStringLen = recvfrom(sock, recvString, MAXRECVSTRING, 0, NULL, 0)) < 0)
-        err_msg(errno, "recvfrom() failed");
+    while(true) {
+        /* Receive a single datagram from the server */
+        if ((recvStringLen = recvfrom(sock, recvString, MAXRECVSTRING, 0, NULL, 0)) < 0)
+            err_msg(errno, "recvfrom() failed");
 
-    recvString[recvStringLen] = '\0';
-    printf("Received: %s\n", recvString);    /* Print the received string */
+        // recvString[recvStringLen] = '\0';
+        puts( recvString);    /* Print the received string */
+    }
+
+   
     
     close(sock);
     exit(0);

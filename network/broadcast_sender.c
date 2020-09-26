@@ -12,19 +12,19 @@ int main(int argc, char *argv[])
     struct sockaddr_in broadcastAddr; /* Broadcast address */
     char *broadcastIP;                /* IP broadcast address */
     unsigned short broadcastPort;     /* Server port */
-    char *sendString;                 /* String to broadcast */
+    char sendString[8096];                 /* String to broadcast */
     int broadcastPermission;          /* Socket opt to set permission to broadcast */
     unsigned int sendStringLen;       /* Length of string to broadcast */
 
-    if (argc < 4)                     /* Test for correct number of parameters */
+    if (argc < 3)                     /* Test for correct number of parameters */
     {
-        fprintf(stderr,"Usage:  %s <IP Address> <Port> <Send String>\n", argv[0]);
+        fprintf(stderr,"Usage:  %s <IP Address> <Port>\n", argv[0]);
         exit(1);
     }
 
     broadcastIP = argv[1];            /* First arg:  broadcast IP address */ 
     broadcastPort = atoi(argv[2]);    /* Second arg:  broadcast port */
-    sendString = argv[3];             /* Third arg:  string to broadcast */
+    // sendString = argv[3];             /* Third arg:  string to broadcast */
 
     /* Create socket for sending/receiving datagrams */
     if ((sock = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0)
@@ -42,15 +42,19 @@ int main(int argc, char *argv[])
     broadcastAddr.sin_addr.s_addr = inet_addr(broadcastIP);/* Broadcast IP address */
     broadcastAddr.sin_port = htons(broadcastPort);         /* Broadcast port */
 
-    sendStringLen = strlen(sendString);  /* Find length of sendString */
+    
     for (;;) /* Run forever */
     {
+        if (fgets(sendString, 8096, stdin) == NULL) {
+            err_exit(errno, "fgets");
+        }
+        sendStringLen = strlen(sendString);  /* Find length of sendString */
+
          /* Broadcast sendString in datagram to clients every 3 seconds*/
-         if (sendto(sock, sendString, sendStringLen, 0, (struct sockaddr *) 
+        if (sendto(sock, sendString, sendStringLen, 0, (struct sockaddr *) 
                &broadcastAddr, sizeof(broadcastAddr)) != sendStringLen)
              err_msg(errno, "sendto() sent a different number of bytes than expected");
 
-        sleep(3);   /* Avoids flooding the network */
     }
     /* NOT REACHED */
 }
