@@ -130,11 +130,6 @@ char *trim(char *str, const char *seps) {
 }
 
 
-
-
-/*
- * Join `dir` with `file`
- */
 char * str_join( const char *seperator, const char *first...) {
     size_t i, len, size = 1024;
     va_list vl;
