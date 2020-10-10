@@ -71,7 +71,7 @@ static ssize_t rio_read(rio_t *rp, void *usrbuf, size_t n)
 
   while (rp->rio_cnt <= 0)    /* Refill if buf is empty */
   {
-    rp->rio_cnt = read(rp->rio_fd, rp->rio_buf, sizeof(rp->rio_buf));
+    rp->rio_cnt = read(rp->rio_fd, rp->rio_buf, RIO_BUFSIZE);
     if (rp->rio_cnt < 0)
     {
       if (errno != EINTR) /* Interrupted by sig handler return */
@@ -219,7 +219,7 @@ ssize_t Rio_readlineb(rio_t *rp, char *usrbuf, size_t maxlen)
  *       -1 with errno set for other errors.
  */
 /* $begin open_clientfd */
-int open_clientfd(char *hostname, char *port)
+int open_clientfd(const char *hostname, const char *port)
 {
   int clientfd, rc;
   struct addrinfo hints, *listp, *p;
@@ -269,7 +269,7 @@ int open_clientfd(char *hostname, char *port)
  *       -1 with errno set for other errors.
  */
 /* $begin open_listenfd */
-int open_listenfd(char *port)
+int open_listenfd(const char *port)
 {
   struct addrinfo hints, *listp, *p;
   int listenfd, rc, optval = 1;
@@ -321,3 +321,37 @@ int open_listenfd(char *port)
   return listenfd;
 }
 /* $end open_listenfd */
+
+/****************************************************
+ * Wrappers for reentrant protocol-independent helpers
+ ****************************************************/
+int Open_clientfd(char *hostname, char *port)
+{
+  int rc;
+  char msg[MAXLINE];
+  if ((rc = open_clientfd(hostname, port)) < 0)
+  {
+    sprintf(msg, "Open_clientfd error %s:%s", hostname, port);
+    err_exit(errno, msg);
+  }
+  return rc;
+}
+
+int Open_listenfd(char *port)
+{
+  int rc;
+
+  if ((rc = open_listenfd(port)) < 0)
+    err_exit(errno, "Open_listenfd error");
+  return rc;
+}
+
+
+void Close(int fd)
+{
+  if (fd < 1)
+    return;
+  if ((close(fd)) < 0)
+    err_exit(errno, "Close error");
+}
+

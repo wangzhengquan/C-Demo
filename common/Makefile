@@ -18,7 +18,7 @@ DEPENDENCES = $(patsubst %.c, $(DEST)/%.d, $(SOURCES))
 ifeq ($(DEBUG),y)
   MYLIBS = $(LIBCOMMON)
 else
-  MYLIBS = $(LIBCOMMON)
+  MYLIBS = $(LIBCOMMON) $(DLIBCOMMON)
 endif
 
 #PREFIX is environment variable, but if it is not set, then set default value
