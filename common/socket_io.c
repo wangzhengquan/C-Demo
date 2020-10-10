@@ -71,7 +71,7 @@ static ssize_t rio_read(rio_t *rp, void *usrbuf, size_t n)
 
   while (rp->rio_cnt <= 0)    /* Refill if buf is empty */
   {
-    rp->rio_cnt = read(rp->rio_fd, rp->rio_buf, RIO_BUFSIZE);
+    rp->rio_cnt = read(rp->rio_fd, rp->rio_buf, sizeof(rp->rio_buf));
     if (rp->rio_cnt < 0)
     {
       if (errno != EINTR) /* Interrupted by sig handler return */

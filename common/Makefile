@@ -9,7 +9,7 @@ PREFIX = $(DEST)
 LIBCOMMON = $(DEST)/libusgcommon.a
 DLIBCOMMON = $(DEST)/libusgcommon.so
 
-SOURCES := $(wildcard *.c)
+SOURCES := $(wildcard *.c ./**/*.c)
 OBJS   = $(patsubst %.c, $(DEST)/%.o, $(SOURCES)) 
 DEPENDENCES = $(patsubst %.c, $(DEST)/%.d, $(SOURCES)) 
 
