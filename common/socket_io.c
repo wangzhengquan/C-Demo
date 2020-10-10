@@ -325,7 +325,7 @@ int open_listenfd(const char *port)
 /****************************************************
  * Wrappers for reentrant protocol-independent helpers
  ****************************************************/
-int Open_clientfd(char *hostname, char *port)
+int Open_clientfd(const char *hostname, const char *port)
 {
   int rc;
   char msg[MAXLINE];
@@ -337,7 +337,7 @@ int Open_clientfd(char *hostname, char *port)
   return rc;
 }
 
-int Open_listenfd(char *port)
+int Open_listenfd(const char *port)
 {
   int rc;
 

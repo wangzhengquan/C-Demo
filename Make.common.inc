@@ -11,7 +11,7 @@ help:
 
 $(DEST)/%.d: %.c
 	@echo generating dependences of $< ...
-	@test -d ${DEST} || mkdir ${DEST}; \
+	@test -d $(DEST)/$(shell dirname $<) || mkdir -p $(DEST)/$(shell dirname $<); \
 	$(CC) -M $(CPPFLAGS) $< > $@.$$$$;                      \
 	sed 's,\($*\)\.o[ :]*,$(DEST)/\1 $(DEST)/\1.o $@ : ,g' < $@.$$$$ > $@;     \
 	rm -f $@.$$$$

@@ -1,5 +1,6 @@
 # debug "make --just-print"
 DIRS = common test network
+TAR_NAME = C-Demo.tar.gz
 
 all:
 	@for i in $(DIRS); do \
@@ -11,3 +12,8 @@ clean:
 	@for i in $(DIRS); do \
 		(cd $$i && echo ">>>>>> cleaning $$i ..." && $(MAKE) clean) || exit 1; \
 	done
+
+
+tar:
+	rm -f $(TAR_NAME)
+	git archive --format tar.gz --output $(TAR_NAME) master
