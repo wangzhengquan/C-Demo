@@ -35,7 +35,7 @@ ssize_t rio_readn(int fd, void *usrbuf, size_t n)
  * rio_writen - Robustly write n bytes (unbuffered)
  */
 /* $begin rio_writen */
-ssize_t rio_writen(int fd, void *usrbuf, size_t n)
+ssize_t rio_writen(int fd, const void *usrbuf, size_t n)
 {
   size_t nleft = n;
   ssize_t nwritten;
@@ -177,7 +177,7 @@ ssize_t Rio_readn(int fd, void *ptr, size_t nbytes)
   return n;
 }
 
-void Rio_writen(int fd, void *usrbuf, size_t n)
+void Rio_writen(int fd, const void *usrbuf, size_t n)
 {
   if (rio_writen(fd, usrbuf, n) != n)
     err_exit(errno, "Rio_writen error");

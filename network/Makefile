@@ -13,7 +13,8 @@ LDLIBS += -lusgcommon
 INCLUDES += -I$(ROOT)/common/include
 
 
-PROGS =	$(DEST)/broadcast_sender $(DEST)/broadcast_receiver
+PROGS =	$(DEST)/broadcast_sender $(DEST)/broadcast_receiver \
+				$(DEST)/echoservers $(DEST)/echoclient
 
 DEPENDENCES = $(patsubst %, %.d, $(PROGS)) 
 
