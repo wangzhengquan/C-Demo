@@ -29,6 +29,11 @@ int main(int argc, char **argv)
   struct sockaddr_storage clientaddr;
   static pool pool;
 
+  char clienthost[NI_MAXHOST];
+  char clientport[NI_MAXSERV];
+  #define ADDRSTRLEN (NI_MAXHOST + NI_MAXSERV + 10)
+  char addrStr[ADDRSTRLEN];
+
   if (argc != 2)
   {
     fprintf(stderr, "usage: %s <port>\n", argv[0]);
@@ -47,7 +52,16 @@ int main(int argc, char **argv)
     if (FD_ISSET(listenfd, &pool.ready_set))   //line:conc:echoservers:listenfdready
     {
       clientlen = sizeof(struct sockaddr_storage);
-      connfd = accept(listenfd, (SA *)&clientaddr, &clientlen); //line:conc:echoservers:accept
+      connfd = accept(listenfd, (SA *)&clientaddr, &clientlen); 
+
+      // print connection from
+      if (getnameinfo((struct sockaddr *) &clientaddr, clientlen,
+                  clienthost, NI_MAXHOST, clientport, NI_MAXSERV, 0) == 0)
+          snprintf(addrStr, ADDRSTRLEN, "(%s:%s)", clienthost, clientport);
+      else
+          snprintf(addrStr, ADDRSTRLEN, "(?UNKNOWN?)");
+      printf("Connection from %s\n", addrStr);
+
       add_client(connfd, &pool); //line:conc:echoservers:addclient
     }
 
