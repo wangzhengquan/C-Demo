@@ -89,9 +89,12 @@ main(int argc, char **argv)
               /*connection reset by client */
               printf("client[%d] aborted connection\n", i);
               close(connfd);
-              // Closing a file descriptor automatically removes it from all of the epoll interest lists of which it is a member.
-              if (epoll_ctl(epfd, EPOLL_CTL_DEL, connfd, NULL) == -1)
-                err_msg(errno, "epoll_ctl EPOLL_CTL_DEL");
+              /**
+              An open file description is removed from the epoll interest list once all file descriptors that refer to it have been closed.
+              */
+
+              // if (epoll_ctl(epfd, EPOLL_CTL_DEL, connfd, NULL) == -1)
+              //   err_msg(errno, "epoll_ctl EPOLL_CTL_DEL");
             }
             else
               err_msg( errno, "read error");
@@ -101,9 +104,11 @@ main(int argc, char **argv)
             /*4connection closed by client */
             printf("client[%d] closed connection\n", i);
             close(connfd);
-            // Closing a file descriptor automatically removes it from all of the epoll interest lists of which it is a member.
-            if (epoll_ctl(epfd, EPOLL_CTL_DEL, connfd, NULL) == -1)
-              err_msg(errno, "epoll_ctl EPOLL_CTL_DEL");
+           /**
+            An open file description is removed from the epoll interest list once all file descriptors that refer to it have been closed.
+            */
+            // if (epoll_ctl(epfd, EPOLL_CTL_DEL, connfd, NULL) == -1)
+            //   err_msg(errno, "epoll_ctl EPOLL_CTL_DEL");
           }
           else
             rio_writen(connfd, buf, n);
@@ -121,6 +126,9 @@ main(int argc, char **argv)
            descriptor is closed. */
         connfd = evlist[i].data.fd;
         printf("    closing fd %d\n", connfd);
+        /**
+        An open file description is removed from the epoll interest list once all file descriptors that refer to it have been closed.
+        */
         if (close(connfd) == -1)
           err_exit(errno, "close");
       }
