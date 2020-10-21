@@ -13,7 +13,7 @@ LDLIBS += -lusgcommon
 INCLUDES += -I$(ROOT)/common/include
 
 
-PROGS =	$(DEST)/test_file
+PROGS =	$(DEST)/test_logger
 
 DEPENDENCES = $(patsubst %, %.d, $(PROGS)) 
 

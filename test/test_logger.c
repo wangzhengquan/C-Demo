@@ -10,9 +10,9 @@ int main() {
 	// Logger logger(config);
 	Logger logger("config.txt");
 	logger.debug("debug");
-	logger.log(Logger::INFO, "info %d", Logger::INFO);
-	logger.warn("warn");
-	logger.error("error");
-	logger.fatal("fatal %d", Logger::FATAL);
+	logger.log(Logger::INFO, "info %d\n", Logger::INFO);
+	logger.warn("warn %d\n", 123);
+	logger.error("error %d\n", 123);
+	logger.fatal("fatal %d\n", Logger::FATAL);
 
 }

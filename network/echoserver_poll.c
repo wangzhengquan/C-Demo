@@ -18,6 +18,13 @@ main(int argc, char **argv)
   struct sockaddr_in  cliaddr, servaddr;
   int port;
 
+  
+  char clienthost[NI_MAXHOST];
+  char clientport[NI_MAXSERV];
+  #define ADDRSTRLEN (NI_MAXHOST + NI_MAXSERV + 10)
+  char addrStr[ADDRSTRLEN];
+
+
   if (argc != 2)
   {
     fprintf(stderr, "usage: %s <port>\n", argv[0]);
@@ -53,9 +60,14 @@ main(int argc, char **argv)
     {
       clilen = sizeof(cliaddr);
       connfd = accept(listenfd, (struct sockaddr *) &cliaddr, &clilen);
-#ifdef  NOTDEF
-      printf("new client: %s\n", sock_ntop((struct sockaddr *) &cliaddr, clilen));
-#endif
+
+      if (getnameinfo((struct sockaddr *) &cliaddr, clilen,
+                  clienthost, NI_MAXHOST, clientport, NI_MAXSERV, 0) == 0)
+          snprintf(addrStr, ADDRSTRLEN, "(%s:%s)", clienthost, clientport);
+      else
+          snprintf(addrStr, ADDRSTRLEN, "(?UNKNOWN?)");
+      printf("Connection from %s\n", addrStr);
+
 
       for (i = 1; i < OPEN_MAX; i++)
         if (client[i].fd < 0)
@@ -85,9 +97,9 @@ main(int argc, char **argv)
           if (errno == ECONNRESET)
           {
             /*4connection reset by client */
-#ifdef  NOTDEF
+
             printf("client[%d] aborted connection\n", i);
-#endif
+
             close(sockfd);
             client[i].fd = -1;
           }

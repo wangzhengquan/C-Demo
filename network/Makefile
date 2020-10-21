@@ -14,7 +14,7 @@ INCLUDES += -I$(ROOT)/common/include
 
 
 PROGS =	$(DEST)/broadcast_sender $(DEST)/broadcast_receiver \
-				$(DEST)/echoserver_select1 $(DEST)/echoclient \
+				$(DEST)/echoserver_epoll  $(DEST)/echoserver_poll $(DEST)/echoclient
 
 
 DEPENDENCES = $(patsubst %, %.d, $(PROGS)) 

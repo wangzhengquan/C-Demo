@@ -218,12 +218,10 @@ ssize_t Rio_readlineb(rio_t *rp, char *usrbuf, size_t maxlen)
  *       -2 for getaddrinfo error
  *       -1 with errno set for other errors.
  */
-/* $begin open_clientfd */
 int open_clientfd(const char *hostname, const char *port)
 {
   int clientfd, rc;
   struct addrinfo hints, *listp, *p;
-
   /* Get a list of potential server addresses */
   memset(&hints, 0, sizeof(struct addrinfo));
   hints.ai_socktype = SOCK_STREAM;  /* Open a connection */
@@ -234,23 +232,21 @@ int open_clientfd(const char *hostname, const char *port)
     fprintf(stderr, "getaddrinfo failed (%s:%s): %s\n", hostname, port, gai_strerror(rc));
     return -2;
   }
-
   /* Walk the list for one that we can successfully connect to */
   for (p = listp; p; p = p->ai_next)
   {
     /* Create a socket descriptor */
     if ((clientfd = socket(p->ai_family, p->ai_socktype, p->ai_protocol)) < 0)
       continue; /* Socket failed, try the next */
-
     /* Connect to the server */
     if (connect(clientfd, p->ai_addr, p->ai_addrlen) != -1)
       break; /* Success */
-    if (close(clientfd) < 0) { /* Connect failed, try another */  //line:netp:openclientfd:closefd
+// puts("open_clientfd 2-3");
+    if (close(clientfd) < 0) { /* Connect failed, try another */
       fprintf(stderr, "open_clientfd: close failed: %s\n", strerror(errno));
       return -1;
     }
   }
-
   /* Clean up */
   freeaddrinfo(listp);
   if (!p) /* All connects failed */
@@ -258,7 +254,7 @@ int open_clientfd(const char *hostname, const char *port)
   else    /* The last connect succeeded */
     return clientfd;
 }
-/* $end open_clientfd */
+
 
 /*
  * open_listenfd - Open and return a listening socket on port. This

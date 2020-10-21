@@ -17,7 +17,7 @@ private:
   FILE *logFile;
 
   void dolog(const char *fmt, va_list ap, int level, int err = 0) {
-    char buf[MAXBUF];
+    char buf[MAXLINE];
 
     struct timeval tv;
     struct tm *info;
@@ -42,6 +42,8 @@ private:
    
     fflush(NULL); /* flushes all stdio output streams */
   }
+
+  
   void init();
 
 private:
