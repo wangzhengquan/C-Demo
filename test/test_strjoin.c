@@ -21,8 +21,7 @@ int main() {
 	printf("array_join:\n%s\n", path);
 
 	char **arr2;
-	int len;
-	arr2 = str_split(path, BLANK, &len);
+	int len = str_split(path, BLANK, &arr2);
 	printf("str_split\n");
 	for(int i = 0; i< len; i++) {
 		printf("%d) %s.\n", i, arr2[i]);

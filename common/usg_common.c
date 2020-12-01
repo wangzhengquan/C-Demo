@@ -253,7 +253,8 @@ char * path_join(const char *path, ...) {
   return buf;
 }
 
-char ** str_split( const char *_str, const char *delim, int *arr_len) {
+int str_split(const char *_str, const char *delim, char *** arr_addr) {
+// char *[] str_split( const char *_str, const char *delim,  int *arr_len) {
 
   size_t len = 64;
   size_t i = 0;
@@ -292,16 +293,17 @@ char ** str_split( const char *_str, const char *delim, int *arr_len) {
     }
   }
   arr[i] = NULL;
-  if(arr_len != NULL) {
-    *arr_len = i;
-  }
+  *arr_addr = arr;
+  // if(arr_len != NULL) {
+  //   *arr_len = i;
+  // }
   free(str);
-  return arr;
+  return i;
 
 LABEL_ERROR:
   free(str);
-  err_exit(errno, "str_split calloc");
-  return NULL;
+  err_msg(errno, "str_split calloc");
+  return 0;
 }
 
 

@@ -98,8 +98,14 @@ char *ltrim(char *str, const char *seps);
 char *rtrim(char *str, const char *seps);
 char *trim(char *str, const char *seps);
 
+/**
+ * @ seperator 分割符
+ */
 char * str_join( const char *seperator, const char *first...);
-char ** str_split(const char *str, const char *delim, int *arr_len);
+/**
+ * 把字符串以@delim分割为数组，数组的地址存放在@arr_addr
+ */
+int str_split(const char *str, const char *delim, char *** arr_addr);
 char * array_join(char * const arr[], const char *seperator);
 char * path_join(const char *path, ...);
 // 反向查询
