@@ -101,7 +101,7 @@ char *trim(char *str, const char *seps);
 /**
  * @ seperator 分割符
  */
-char * str_join( const char *seperator, const char *first...);
+char * str_join( const char *seperator, const char *first, ...);
 /**
  * 把字符串以@delim分割为数组，数组的地址存放在@arr_addr
  */

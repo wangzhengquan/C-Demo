@@ -111,7 +111,7 @@ int SemUtil::dec_timeout(const int semId, const struct timespec *timeout) {
 
   while (semtimedop(semId, &sops, 1, timeout) == -1)
     if (errno != EINTR) {
-     // err_msg(errno, "SemUtil::dec_timeout");
+      err_msg(errno, "SemUtil::dec_timeout");
       return -1;
     }
 
@@ -134,7 +134,7 @@ int SemUtil::zero(int semId) {
 
   while (semop(semId, &sops, 1) == -1)
     if (errno != EINTR) {
-     // err_msg(errno, "SemUtil::dec");
+      err_msg(errno, "SemUtil::zero");
       return -1;
     }
 
@@ -151,7 +151,7 @@ int SemUtil::zero_nowait(int semId) {
 
   while (semop(semId, &sops, 1) == -1)
     if (errno != EINTR) {
-     // err_msg(errno, "SemUtil::dec_nowait");
+      err_msg(errno, "SemUtil::zero_nowait");
       return -1;
     }
 
@@ -167,7 +167,7 @@ int SemUtil::zero_timeout(const int semId, const struct timespec *timeout) {
 
   while (semtimedop(semId, &sops, 1, timeout) == -1)
     if (errno != EINTR) {
-     // err_msg(errno, "SemUtil::dec_timeout");
+      err_msg(errno, "SemUtil::zero_timeout");
       return -1;
     }
 
