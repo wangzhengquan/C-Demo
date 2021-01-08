@@ -121,4 +121,5 @@ void Logger::fatal(const char *fmt, ...) {
 	va_start(ap, fmt);
 	dolog(fmt, ap, FATAL);
 	va_end(ap);
+  abort();
 }

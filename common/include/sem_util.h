@@ -1,5 +1,5 @@
-#ifndef PCSEM_H
-#define PCSEM_H  
+#ifndef _SEM_UTIL_H
+#define _SEM_UTIL_H  
 
 #include "usg_common.h"
 #include "usg_typedef.h"
