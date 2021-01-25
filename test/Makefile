@@ -8,12 +8,12 @@ include $(ROOT)/Make.defines.$(PLATFORM)
 LDDIR += -L$(DEST)
 
 # 开源工具包
-LDLIBS += -lusgcommon
+LDLIBS += -lusgcommon -lpthread
 
 INCLUDES += -I$(ROOT)/common/include
 
 
-PROGS =	$(DEST)/test_file $(DEST)/test1 $(DEST)/test_strjoin
+PROGS =	$(DEST)/test_file $(DEST)/test_logger $(DEST)/test_strjoin
 
 DEPENDENCES = $(patsubst %, %.d, $(PROGS)) 
 

@@ -14,9 +14,12 @@ namespace SemUtil {
 	int zero_nowait(int semId);
 	int zero_timeout(const int semId, const struct timespec * timeout);
 	int inc(int semId);
+	int set(int semId, int val);
+
 	void remove(int semid);
 
-	void set(int semId, int val);
+
+	
 
 }
 

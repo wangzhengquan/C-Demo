@@ -70,16 +70,15 @@ int SemUtil::get(key_t key, unsigned int value) {
 
 /* Reserve semaphore - decrement it by 1 */
 int SemUtil::dec(int semId) {
-// logger.debug("%d: SemUtil::dec\n", semId);
   struct sembuf sops;
 
   sops.sem_num = 0;
   sops.sem_op = -1;
-  sops.sem_flg = 0;
+  sops.sem_flg = SEM_UNDO;
 
   while (semop(semId, &sops, 1) == -1)
     if (errno != EINTR) {
-      err_msg(errno, "SemUtil::dec");
+      // err_msg(errno, "SemUtil::dec");
       return -1;
     }
 
@@ -91,15 +90,10 @@ int SemUtil::dec_nowait(int semId) {
 
   sops.sem_num = 0;
   sops.sem_op = -1;
-  sops.sem_flg = IPC_NOWAIT;
+  sops.sem_flg = IPC_NOWAIT | SEM_UNDO;
+ 
 
-  while (semop(semId, &sops, 1) == -1)
-    if (errno != EINTR) {
-      err_msg(errno, "SemUtil::dec_nowait");
-      return -1;
-    }
-
-  return 0;
+  return semop(semId, &sops, 1);
 }
 
 int SemUtil::dec_timeout(const int semId, const struct timespec *timeout) {
@@ -107,11 +101,11 @@ int SemUtil::dec_timeout(const int semId, const struct timespec *timeout) {
 
   sops.sem_num = 0;
   sops.sem_op = -1;
-  sops.sem_flg = 0;
+  sops.sem_flg = SEM_UNDO;
 
   while (semtimedop(semId, &sops, 1, timeout) == -1)
     if (errno != EINTR) {
-      err_msg(errno, "SemUtil::dec_timeout");
+      // err_msg(errno, "SemUtil::dec_timeout");
       return -1;
     }
 
@@ -134,7 +128,7 @@ int SemUtil::zero(int semId) {
 
   while (semop(semId, &sops, 1) == -1)
     if (errno != EINTR) {
-      err_msg(errno, "SemUtil::zero");
+      // err_msg(errno, "SemUtil::zero");
       return -1;
     }
 
@@ -149,13 +143,9 @@ int SemUtil::zero_nowait(int semId) {
   sops.sem_op = 0;
   sops.sem_flg = IPC_NOWAIT;
 
-  while (semop(semId, &sops, 1) == -1)
-    if (errno != EINTR) {
-      err_msg(errno, "SemUtil::zero_nowait");
-      return -1;
-    }
+  
 
-  return 0;
+  return semop(semId, &sops, 1);
 }
 
 int SemUtil::zero_timeout(const int semId, const struct timespec *timeout) {
@@ -167,7 +157,7 @@ int SemUtil::zero_timeout(const int semId, const struct timespec *timeout) {
 
   while (semtimedop(semId, &sops, 1, timeout) == -1)
     if (errno != EINTR) {
-      err_msg(errno, "SemUtil::zero_timeout");
+      // err_msg(errno, "SemUtil::zero_timeout");
       return -1;
     }
 
@@ -181,25 +171,23 @@ int SemUtil::inc(int semId) {
 
   sops.sem_num = 0;
   sops.sem_op = 1;
-  sops.sem_flg = 0;
+  sops.sem_flg = SEM_UNDO;
 
-  int rv = semop(semId, &sops, 1);
-  if (rv == -1) {
-    err_msg(errno, "SemUtil::inc");
-  }
-  return rv;
+  return semop(semId, &sops, 1);
+  
 }
+
+
+int SemUtil::set(int semId, int val) {
+  union semun arg;
+  arg.val = val;
+  return semctl(semId, 0, SETVAL, arg);
+}
+
 
 void SemUtil::remove(int semid) {
   union semun dummy;
   if (semctl(semid, 0, IPC_RMID, dummy) == -1)
     err_msg(errno, "SemUtil::remove");
-}
-
-void SemUtil::set(int semId, int val) {
-  union semun arg;
-  arg.val = val;
-  if (semctl(semId, 0, SETVAL, arg) == -1)
-    err_msg(errno, "SemUtil::set");
 }
 
