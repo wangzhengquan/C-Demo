@@ -9,22 +9,22 @@ help:
 
 
 
-$(DEST)/%.d: %.c
+$(DEST)/%.d: %.cpp
 	@echo generating dependences of $< ...
 	@test -d $(DEST)/$(shell dirname $<) || mkdir -p $(DEST)/$(shell dirname $<); \
 	$(CC) -M $(CPPFLAGS) $< > $@.$$$$;                      \
 	sed 's,\($*\)\.o[ :]*,$(DEST)/\1 $(DEST)/\1.o $@ : ,g' < $@.$$$$ > $@;     \
 	rm -f $@.$$$$
 
-$(DEST)/%.o: %.c
-	$(CC) ${CPPFLAGS} $(CFLAGS) -c $(filter %.c, $^) -o $@
+$(DEST)/%.o: %.cpp
+	$(CC) ${CPPFLAGS} $(CFLAGS) -c $(filter %.cpp, $^) -o $@
 
 
 ${DEST}/%:	%.o
 	$(CC) $(LDFLAGS) $(filter %.o, $^) -o $@ $(LDLIBS)
 
-${DEST}/%:	%.c
-	$(CC) ${CPPFLAGS} $(CFLAGS) $(LDFLAGS) $(filter %.c, $^) -o $@ $(LDLIBS)
+${DEST}/%:	%.cpp
+	$(CC) ${CPPFLAGS} $(CFLAGS) $(LDFLAGS) $(filter %.cpp, $^) -o $@ $(LDLIBS)
 
 gdb:
 	gdb -n -x .gdbinit
