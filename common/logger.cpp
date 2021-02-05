@@ -72,6 +72,7 @@ void Logger::dolog(const char *fmt, va_list ap, int level, int err) {
   
   if(logFile != NULL) {
     fputs(buf, logFile);
+    fflush(logFile);
   }
   if(config.console) {
      fputs(buf, stdout);
