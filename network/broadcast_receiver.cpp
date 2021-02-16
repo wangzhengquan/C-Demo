@@ -1,3 +1,5 @@
+// http://cs.baylor.edu/~donahoo/practical/CSockets/
+
 #include <stdio.h>      /* for printf() and fprintf() */
 #include <sys/socket.h> /* for socket(), connect(), sendto(), and recvfrom() */
 #include <arpa/inet.h>  /* for sockaddr_in and inet_addr() */
