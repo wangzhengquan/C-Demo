@@ -4,8 +4,7 @@
 #include <stdlib.h>     /* for atoi() and exit() */
 #include <string.h>     /* for memset() */
 #include <unistd.h>     /* for sleep() */
-
-void DieWithError(char *errorMessage);  /* External error handling function */
+#include  "usg_common.h"
 
 int main(int argc, char *argv[])
 {
@@ -35,12 +34,12 @@ int main(int argc, char *argv[])
 
     /* Create socket for sending/receiving datagrams */
     if ((sock = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0)
-        DieWithError("socket() failed");
+        err_exit(errno, "socket() failed");
 
     /* Set TTL of multicast packet */
     if (setsockopt(sock, IPPROTO_IP, IP_MULTICAST_TTL, (void *) &multicastTTL, 
           sizeof(multicastTTL)) < 0)
-        DieWithError("setsockopt() failed");
+        err_exit(errno, "setsockopt() failed");
 
     /* Construct local address structure */
     memset(&multicastAddr, 0, sizeof(multicastAddr));   /* Zero out structure */
@@ -49,13 +48,8 @@ int main(int argc, char *argv[])
     multicastAddr.sin_port = htons(multicastPort);         /* Multicast port */
 
     sendStringLen = strlen(sendString);  /* Find length of sendString */
-    for (;;) /* Run forever */
-    {
-        /* Multicast sendString in datagram to clients every 3 seconds */
-        if (sendto(sock, sendString, sendStringLen, 0, (struct sockaddr *) 
-              &multicastAddr, sizeof(multicastAddr)) != sendStringLen)
-            DieWithError("sendto() sent a different number of bytes than expected");
-        sleep(3);
-    }
-    /* NOT REACHED */
+    /* Multicast sendString in datagram to clients every 3 seconds */
+    if (sendto(sock, sendString, sendStringLen, 0, (struct sockaddr *) 
+          &multicastAddr, sizeof(multicastAddr)) != sendStringLen)
+    err_exit(errno, "sendto() sent a different number of bytes than expected");
 }

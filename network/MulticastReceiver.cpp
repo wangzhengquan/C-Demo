@@ -4,10 +4,9 @@
 #include <stdlib.h>     /* for atoi() and exit() */
 #include <string.h>     /* for memset() */
 #include <unistd.h>     /* for close() */
-
+#include  "usg_common.h"
 #define MAXRECVSTRING 255  /* Longest string to receive */
 
-void DieWithError(char *errorMessage);  /* External error handling function */
 
 int main(int argc, char *argv[])
 {
@@ -30,7 +29,7 @@ int main(int argc, char *argv[])
 
     /* Create a best-effort datagram socket using UDP */
     if ((sock = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0)
-        DieWithError("socket() failed");
+        err_exit(errno, "socket() failed");
 
     /* Construct bind structure */
     memset(&multicastAddr, 0, sizeof(multicastAddr));   /* Zero out structure */
@@ -40,7 +39,7 @@ int main(int argc, char *argv[])
 
     /* Bind to the multicast port */
     if (bind(sock, (struct sockaddr *) &multicastAddr, sizeof(multicastAddr)) < 0)
-        DieWithError("bind() failed");
+        err_exit(errno, "bind() failed");
 
     /* Specify the multicast group */
     multicastRequest.imr_multiaddr.s_addr = inet_addr(multicastIP);
@@ -49,14 +48,17 @@ int main(int argc, char *argv[])
     /* Join the multicast address */
     if (setsockopt(sock, IPPROTO_IP, IP_ADD_MEMBERSHIP, (void *) &multicastRequest,
           sizeof(multicastRequest)) < 0)
-        DieWithError("setsockopt() failed");
+        err_exit(errno, "setsockopt() failed");
 
-    /* Receive a single datagram from the server */
-    if ((recvStringLen = recvfrom(sock, recvString, MAXRECVSTRING, 0, NULL, 0)) < 0)
-        DieWithError("recvfrom() failed");
+    for(;;) {
+        /* Receive a single datagram from the server */
+        if ((recvStringLen = recvfrom(sock, recvString, MAXRECVSTRING, 0, NULL, 0)) < 0)
+            err_exit(errno, "recvfrom() failed");
 
-    recvString[recvStringLen] = '\0';
-    printf("Received: %s\n", recvString);    /* Print the received string */
+        recvString[recvStringLen] = '\0';
+        printf("Received: %s\n", recvString);    /* Print the received string */
+    }
+  
     
     close(sock);
     exit(0);

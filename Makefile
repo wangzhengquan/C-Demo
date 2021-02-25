@@ -1,5 +1,5 @@
 # debug "make --just-print"
-DIRS = common test
+DIRS = common test network
 TAR_NAME = C-Demo.tar.gz
 
 all:
