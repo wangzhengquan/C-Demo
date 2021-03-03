@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
     if (argc == 5)                     /* Is TTL specified on command-line? */
         multicastTTL = atoi(argv[4]);  /* Command-line specified TTL */
     else
-        multicastTTL = 1;              /* Default TTL = 1 */
+        multicastTTL = 32;              /* Default TTL = 1 */
 
     /* Create socket for sending/receiving datagrams */
     if ((sock = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0)

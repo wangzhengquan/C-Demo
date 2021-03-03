@@ -23,6 +23,7 @@ DEPENDENCES = $(patsubst %, %.d, $(PROGS))
 LIBCOMMON=$(DEST)/libusgcommon.a
 
 build:	$(LIBCOMMON) $(PROGS)
+# build:	$(PROGS)
 
 symbal: build
 	$(NM) -n $(DEST)/test_logger > $(DEST)/test_logger.sym

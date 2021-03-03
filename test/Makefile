@@ -13,7 +13,7 @@ LDLIBS += -lusgcommon -lpthread
 INCLUDES += -I$(ROOT)/common/include
 
 
-PROGS =	$(DEST)/test_file $(DEST)/test_logger $(DEST)/test_strjoin
+PROGS =	$(DEST)/test_mkdir_r $(DEST)/test_logger $(DEST)/test_strjoin
 
 DEPENDENCES = $(patsubst %, %.d, $(PROGS)) 
 

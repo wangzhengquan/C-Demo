@@ -393,7 +393,7 @@ int mkdir_r(const char *pathname, mode_t mode)
   {
     if (mkdir(pathname, mode) != 0)
     {
-      err_msg(errno, "1 usg_common mkdirr");
+      // err_msg(errno, "1 usg_common mkdirr");
       return -1;
     }
 
@@ -401,16 +401,9 @@ int mkdir_r(const char *pathname, mode_t mode)
   }
 
   parent = strdup(pathname);
-
 LABEL_FIND_PARENT:
   if ( (parent_end = strstr_r(parent, PATH_SEPERATOR)) != NULL)
   {
-    if (parent_end + strlen(PATH_SEPERATOR)  == parent + strlen(parent) )
-    {
-      *parent_end = '\0';
-      goto LABEL_FIND_PARENT;
-    }
-
     *parent_end = '\0';
     if (mkdir_r(parent, mode) == -1)
     {
@@ -420,10 +413,16 @@ LABEL_FIND_PARENT:
   }
 
   free(parent);
+  // printf("pathname=%s\n", pathname);
+
+  //遍历到最头了
+  if(strlen(pathname) == 0) {
+    return 0;
+  }
 
   if (mkdir(pathname, mode) != 0)
   {
-    err_msg(errno, "2 usg_common mkdirr %s", pathname);
+    // err_msg(errno, "2 usg_common mkdirr pathname= %s", pathname);
     return -1;
   }
 
