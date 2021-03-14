@@ -17,7 +17,8 @@ PropertiesConfig::PropertiesConfig(std::string __propertiesFile) : propertiesFil
 
 	    key = trim(strtok(line, delim), 0);
 	    value = trim(strtok(NULL, delim), 0);
-	    propertiesMap.insert({key, value});
+	    // propertiesMap.insert({key, value});
+	    propertiesMap.insert(std::pair<std::string, std::string>(key, value));
 	    // printf("key = %s, value=%s\n", key, value);
 	}
 	fin.close();

@@ -46,6 +46,8 @@ $(LIBCOMMON): $(OBJS)
 $(DLIBCOMMON): $(SOURCES)
 	@echo '>>>>>>' generating $@ ...
 	$(CC) -fPIC -shared $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) $^ -o $@
+	md5sum $(DLIBCOMMON) > $(DLIBCOMMON).md5
+	# md5sum -c $(DLIBCOMMON).md5
 
 
 
