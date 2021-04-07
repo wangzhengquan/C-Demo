@@ -11,7 +11,7 @@ CC = g++
 # preprocessor options 
 CPPFLAGS += $(INCLUDES) -std=c++11
 # compilation options
-CFLAGS += $(DEBUGFLAGS)  -fPIC -Wall -DLINUX -D_GNU_SOURCE $(EXTRA)
+CFLAGS += $(DEBUGFLAGS)  -Wall -DLINUX -D_GNU_SOURCE $(EXTRA)
 # linked options
 LDFLAGS +=
 

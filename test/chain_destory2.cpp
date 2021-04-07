@@ -73,7 +73,7 @@ public:
 
 	~School() {
 		printf("Destroy School\n");
-		
+
 		delete [] classs1;
 
 		free(classs2);
@@ -96,7 +96,9 @@ public:
 
 void mytest() {
 	printf("test begin\n");
-	School School;
+	// School School;
+	School *school = new School;
+	delete school;
 	printf("test end\n");
 }
 

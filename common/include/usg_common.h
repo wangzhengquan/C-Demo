@@ -109,11 +109,11 @@ int str_split(const char *str, const char *delim, char *** arr_addr);
 char * array_join(char * const arr[], const char *seperator);
 char * path_join(const char *path, ...);
 /**
- * 反向查询needle
+ * 反向查询字符串needle
  *
  * @return 查询到的字符串的地址
  */
-char *strstr_r(char *str,  char * needle);
+char *strstr_r( char *str, const  char * needle);
 // 递归创建文件夹
 int mkdir_r(const char *pathname, mode_t mode);
 

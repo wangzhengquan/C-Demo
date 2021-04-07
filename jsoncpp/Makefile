@@ -2,7 +2,7 @@ ROOT := ..
 PLATFORM=$(shell $(ROOT)/systype.sh)
 include $(ROOT)/Make.defines.$(PLATFORM)
 
-RPATH += -Wl,-rpath=$(DEST):$(ROOT)/lib/jsoncpp
+# RPATH += -Wl,-rpath=$(DEST):$(ROOT)/lib/jsoncpp
 # 开源工具包路径
 LDDIR += -L$(DEST) -L$(ROOT)/lib/jsoncpp
 

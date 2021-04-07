@@ -353,8 +353,12 @@ LABEL_ERROR:
 
 
 
-
-char *strstr_r(char *str,  char * needle)
+/**
+ * 反向查询字符串needle
+ *
+ * @return 查询到的字符串的地址
+ */
+char *strstr_r( char *str,  const char * needle)
 {
   size_t needle_len = strlen(needle);
   if (str == NULL || needle == NULL)

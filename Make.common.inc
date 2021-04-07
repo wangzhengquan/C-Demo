@@ -17,7 +17,7 @@ $(DEST)/%.d: %.cpp
 	rm -f $@.$$$$
 
 $(DEST)/%.o: %.cpp
-	$(CC) ${CPPFLAGS} $(CFLAGS) -c $(filter %.cpp, $^) -o $@
+	$(CC) ${CPPFLAGS} $(CFLAGS) -fPIC -c $(filter %.cpp, $^) -o $@
 
 
 ${DEST}/%:	%.o
