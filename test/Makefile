@@ -14,7 +14,7 @@ INCLUDES += -I$(ROOT)/common/include
 
 
 PROGS =	$(DEST)/test_mkdir_r $(DEST)/test_logger $(DEST)/test_strjoin \
-				$(DEST)/chain_destory $(DEST)/chain_destory2
+				$(DEST)/chain_destory $(DEST)/chain_destory2 $(DEST)/sbuf
 
 DEPENDENCES = $(patsubst %, %.d, $(PROGS)) 
 
