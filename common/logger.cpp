@@ -54,7 +54,7 @@ void Logger::init() {
 }
 
 void Logger::dolog(const char *fmt, va_list ap, int level, int err) {
-  char buf[MAXLINE];
+  char buf[MAXBUF];
 
   struct timeval tv;
   struct tm *info;

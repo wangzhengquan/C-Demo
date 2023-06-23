@@ -10,7 +10,7 @@ void test1() {
 
 
 
-	char *strarr[] = {
+	const char *strarr[] = {
 		"aaaa",
 		"bbbbb",
 		"ccccc",

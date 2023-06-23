@@ -3,9 +3,6 @@
 #include "string1.h"               // includes <iostream>
 using std::cin;
 using std::cout;
-/**
- * 如果构造方法里使用了 dynamic memory allocation， 需要重写copy constructor 和 assigment operator
- */
 
 // initializing static class member
 int String::num_strings = 0;
@@ -51,6 +48,9 @@ String::~String()                     // necessary destructor
 
 // overloaded operator methods    
 
+/**
+ * 如果构造方法里使用了 dynamic memory allocation， 需要重写copy constructor 和 copy assigment operator
+ */
 // copy assigment
 String & String::operator=(const String & st)
 {
@@ -109,7 +109,7 @@ ostream & operator<<(ostream & os, const String & st)
     return os; 
 }
 
-    // quick and dirty String input
+// quick and dirty String input
 istream & operator>>(istream & is, String & st)
 {
     char temp[String::CINLIM];

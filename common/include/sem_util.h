@@ -2,7 +2,6 @@
 #define _SEM_UTIL_H  
 
 #include "usg_common.h"
-#include "usg_typedef.h"
 
 namespace SemUtil {
 

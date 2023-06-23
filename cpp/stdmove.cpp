@@ -15,6 +15,9 @@ private:
     static int ct;  // number of objects
     void ShowObject() const;
 public:
+    int a=12;
+    int b{};
+    bool c=true;
     Useless();
     explicit Useless(int k);
     Useless(int k, char ch);
@@ -153,6 +156,20 @@ int main()
         four.ShowData();
         cout << "and object one = ";
         one.ShowData();
+
+
+
+        Useless test1;
+        cout << "a=" << test1.a << ";b=" << test1.b << ";c=" << test1.c << std::endl;
+
+        Useless test2;
+        cout << "a=" << test2.a << ";b=" << test2.b << ";c=" << test2.c << std::endl;
+        // const char * str1 = "hello";
+        // const char * str2 = "hello2";
+        // str2 = str1;
+        // cout <<  str2 << std::endl;
+        // Useless u1(1), u2(2);
+        // u2 = std::move(u2) =  std::move(u1);
     }
     
 }

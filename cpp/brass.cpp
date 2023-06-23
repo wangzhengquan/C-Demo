@@ -63,9 +63,10 @@ void Brass::ViewAcct() const
     restore(initialState, prec); // Restore original format
 }
 
+// ==============================
 // BrassPlus Methods
 BrassPlus::BrassPlus(const string & s, long an, double bal,
-           double ml, double r) : Brass(s, an, bal)
+           double ml, double r) : Brass(s, an, bal)  // Always calls teh super constructor
 {
     maxLoan = ml;
     owesBank = 0.0;

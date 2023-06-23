@@ -16,7 +16,7 @@ $(DEST)/%.d: %.cpp
 	sed 's,\($*\)\.o[ :]*,$(DEST)/\1 $(DEST)/\1.o $@ : ,g' < $@.$$$$ > $@;     \
 	rm -f $@.$$$$
 
-$(DEST)/%.o: %.cpp
+$(DEST)/%.o: %.cpp $(LIBCOMMON)
 	$(CC) ${CPPFLAGS} $(CFLAGS) -fPIC -c $(filter %.cpp, $^) -o $@
 
 

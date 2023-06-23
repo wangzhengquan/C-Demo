@@ -195,7 +195,7 @@ char * str_join( const char *seperator, const char *first, ...)
 }
 
 
-char * array_join(char * const arr[], const char *seperator)
+char * array_join(const char** arr, const char *seperator)
 {
   size_t size = 0, i = 0, arr_len = 0;
 

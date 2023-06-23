@@ -1,6 +1,7 @@
 #ifndef __SOCKET_IO_H__
 #define __SOCKET_IO_H__
 
+// [Beej's Guide to Network Programming](https://beej.us/guide/bgnet/html/#structs)
 #include "usg_common.h"
 
 /* Simplifies calls to bind(), connect(), and accept() */

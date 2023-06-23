@@ -5,79 +5,8 @@
 #ifndef __USG_COMMON_H__
 #define __USG_COMMON_H__
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <unistd.h>
-#include <string.h>
-#include <ctype.h>
-#include <setjmp.h>
-#include <signal.h>
-#include <dirent.h>
-#include <time.h>
-#include <sched.h>
-
-#include <sys/time.h>
-#include <sys/syscall.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <sys/stat.h>
-#include <sys/sem.h>
-#include <sys/shm.h>
-#include <sys/file.h>
-#include <fcntl.h>
-#include <sys/mman.h>
-#include <errno.h>
-#include <math.h>
-#include <pthread.h>
-#include <semaphore.h>
-#include <sys/socket.h>
-#include <netdb.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <libgen.h>
-/*
- * define int8_t uint8_t int16_t uint16_t int32_t uint32_t int64_t uint64_t
-*/
-#include <stdint.h>
-#include <assert.h>
-
-
-#ifdef __cplusplus
-}
-#endif
-
-
-
-//c++ header
-#ifdef __cplusplus
-
- 
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <string>
-
-#include <cstdlib>
-#include <atomic>
-#include <algorithm>
-#include <iomanip>
-#include <limits>
-
-#include <initializer_list>
-#include <vector>
-#include <map>
-#include <set>
-
-#include <functional>
-#include <thread>
-#endif
-
-#include "usg_typedef.h"
+#include "comm_inc.h"
+#include "comm_typedef.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -106,7 +35,7 @@ char * str_join( const char *seperator, const char *first, ...);
  * 把字符串以@delim分割为数组，数组的地址存放在@arr_addr
  */
 int str_split(const char *str, const char *delim, char *** arr_addr);
-char * array_join(char * const arr[], const char *seperator);
+char * array_join(const char **, const char *seperator);
 char * path_join(const char *path, ...);
 /**
  * 反向查询字符串needle
@@ -116,7 +45,7 @@ char * path_join(const char *path, ...);
 char *strstr_r( char *str, const  char * needle);
 // 递归创建文件夹
 int mkdir_r(const char *pathname, mode_t mode);
-
+// 在dirfd指向的目录下面创建文件夹
 int mkdiratfd_r(int dirfd, const char *pathname, mode_t mode);
 int mkdirat_r(const char * dir, const char *pathname, mode_t mode);
 

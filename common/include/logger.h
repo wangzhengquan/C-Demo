@@ -2,7 +2,7 @@
 #define __LOGGER_H__
 
 #include "usg_common.h"
-#include "usg_typedef.h"
+
 
 struct LoggerConfig {
   std::string logFile;

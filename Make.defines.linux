@@ -9,7 +9,7 @@ CC = g++
 # LINK.c = $(CC) $(CFLAGS) $(CPPFLAGS) $(LDFLAGS) $(TARGET_ARCH)
 
 # preprocessor options 
-CPPFLAGS += $(INCLUDES) -std=c++11
+CPPFLAGS += $(INCLUDES) -std=c++17
 # compilation options
 CFLAGS += $(DEBUGFLAGS)  -Wall -DLINUX -D_GNU_SOURCE $(EXTRA)
 # linked options

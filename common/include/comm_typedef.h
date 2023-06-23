@@ -1,5 +1,5 @@
-#ifndef _USG_TYPEDEF_H__
-#define _USG_TYPEDEF_H__
+#ifndef __COMM_TYPEDEF_H__
+#define __COMM_TYPEDEF_H__
 
 #ifdef __cplusplus
 extern "C" {
