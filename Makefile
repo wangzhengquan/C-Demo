@@ -1,5 +1,5 @@
 # debug "make --just-print"
-DIRS = common test network jsoncpp cpp function
+DIRS = common test network jsoncpp cpp
 TAR_NAME = C-Demo.tar.gz
 
 all:

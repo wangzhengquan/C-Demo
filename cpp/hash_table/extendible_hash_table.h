@@ -1,7 +1,11 @@
 /**
  * extendible_hash_table.h
- * https://www.geeksforgeeks.org/extendible-hashing-dynamic-approach-to-dbms/
+ * 
  * Implementation of in-memory hash table using extendible hashing
+ * 
+ * 
+ * https://www.geeksforgeeks.org/extendible-hashing-dynamic-approach-to-dbms/
+ * https://en.wikipedia.org/wiki/Extendible_hashing
  */
 
 #pragma once
@@ -15,10 +19,15 @@
 #include <shared_mutex>
 #include <utility>
 #include <vector>
-// #include "extendible_hash_table_iterator.h"
+#include <cassert>
+#include <stdexcept>
+
+#define DEFAULT_BUCKET_SIZE 4
 
 #define EXTENDIBLE_HASH_TABLE_TEMPLATE_ARGUMENTS template <typename K, typename V>
 #define EXTENDIBLE_HASH_TABLE_TYPE ExtendibleHashTable<K, V>
+
+#define ASSERT(expr, message) assert((expr) && (message))
 
 /**
  * ExtendibleHashTable implements a hash table using the extendible hashing algorithm.
@@ -27,9 +36,15 @@
  */
 EXTENDIBLE_HASH_TABLE_TEMPLATE_ARGUMENTS
 class ExtendibleHashTable  {
+private:
+  class Bucket;
+
 public:
   template <bool>
   class ExtendibleHashTableIterator;
+
+  template <bool>
+  friend class ExtendibleHashTableIterator;
 
   using ElementType = std::pair<K, V>;
   using Iterator =  ExtendibleHashTableIterator<false>;
@@ -38,26 +53,12 @@ public:
    * @brief Create a new ExtendibleHashTable.
    * @param bucket_size: fixed size for each bucket
    */
-  explicit ExtendibleHashTable(size_t bucket_size);
+  explicit ExtendibleHashTable(size_t bucket_size = DEFAULT_BUCKET_SIZE);
 
-  /**
-   * @brief Get the global depth of the directory.
-   * @return The global depth of the directory.
-   */
-  auto GetGlobalDepth() const -> int;
+  template <typename InputIt>
+  ExtendibleHashTable(InputIt first, InputIt last, size_t bucket_size = DEFAULT_BUCKET_SIZE);
 
-  /**
-   * @brief Get the local depth of the bucket that the given directory index points to.
-   * @param dir_index The index in the directory.
-   * @return The local depth of the bucket.
-   */
-  auto GetLocalDepth(int dir_index) const -> int;
-
-  /**
-   * @brief Get the number of buckets in the directory.
-   * @return The number of buckets in the directory.
-   */
-  auto GetNumBuckets() const -> int;
+  ExtendibleHashTable(std::initializer_list<ElementType> init, size_t bucket_size = DEFAULT_BUCKET_SIZE);
 
   /**
    *
@@ -69,7 +70,7 @@ public:
    * @param[out] value The value associated with the key.
    * @return True if the key is found, false otherwise.
    */
-  auto Find(const K &key, V &value) -> bool ;
+  auto find(const K &key) -> Iterator ;
 
   /**
    *
@@ -84,7 +85,7 @@ public:
    * @param key The key to be inserted.
    * @param value The value to be inserted.
    */
-  void Insert(const K &key, const V &value) ;
+  auto insert(const K &key, const V &value) -> std::pair<Iterator, bool>;
 
   /**
    * @brief Given the key, remove the corresponding key-value pair in the hash table.
@@ -92,24 +93,55 @@ public:
    * @param key The key to be deleted.
    * @return True if the key exists, false otherwise.
    */
-  auto Remove(const K &key) -> bool ;
+  auto remove(const K &key) -> bool ;
+  auto remove(Iterator pos) -> Iterator ;
 
-  auto  begin() -> Iterator;
+  auto begin() -> Iterator;
   auto end() -> Iterator;
 
-  auto  cbegin() const -> ConstIterator;
-  auto  cend() const -> ConstIterator;
+  auto cbegin() const -> ConstIterator;
+  auto cend() const -> ConstIterator;
 
-  void Show();
+  void show();
 
+private:
+  /*****************************************************************
+   * Must acquire latch_ first before calling the below functions. *
+   *****************************************************************/
+
+  /**
+   * @brief For the given key, return the entry index in the directory where the key hashes to.
+   * @param key The key to be hashed.
+   * @return The entry index in the directory.
+   */
+  auto indexOf(const K &key) -> size_t;
+  /**
+   * @brief Get the global depth of the directory.
+   * @return The global depth of the directory.
+   */
+  auto getGlobalDepth() const -> int;
+
+  /**
+   * @brief Get the local depth of the bucket that the given directory index points to.
+   * @param dir_index The index in the directory.
+   * @return The local depth of the bucket.
+   */
+  auto getLocalDepth(int dir_index) const -> int;
+
+  /**
+   * @brief Get the number of buckets in the directory.
+   * @return The number of buckets in the directory.
+   */
+  auto getNumBuckets() const -> int;
 
 
 private:
   struct Node {
     ElementType value;
     Node* next;
-    Node(const ElementType& ele = ElementType(), Node* next = nullptr) :
-        value(ele), next(next) {}
+    Node* pre;
+    Node(const ElementType& v = ElementType(), Node* n = nullptr, Node* p = nullptr) :
+        value(v), next(n), pre(p) {}
   };
   /**
    * Bucket class for each hash table bucket that the directory points to.
@@ -120,16 +152,16 @@ private:
     explicit Bucket(size_t capcity, int depth = 0);
 
     /** @brief Check if a bucket is full. */
-    inline auto IsFull() const -> bool { return size_ >= capcity_; }
+    inline auto isFull() const -> bool { return size_ >= capcity_; }
 
     /** @brief Get the local depth of the bucket. */
-    inline auto GetDepth() const -> int { return depth_; }
+    inline auto getDepth() const -> int { return depth_; }
 
     /** @brief Increment the local depth of a bucket. */
-    inline void IncrementDepth() { depth_++; }
+    inline void incrementDepth() { depth_++; }
 
-    inline auto GetSize() const -> size_t { return size_; }
-    inline auto GetList() const -> Node * { return list_; }
+    inline auto getSize() const -> size_t { return size_; }
+    inline auto getList() const -> Node * { return list_; }
     /**
      *
      * @brief Find the value associated with the given key in the bucket.
@@ -137,14 +169,15 @@ private:
      * @param[out] value The value associated with the key.
      * @return True if the key is found, false otherwise.
      */
-    auto Find(const K &key, V &value) -> bool;
+    auto find(const K &key) -> Node *;
 
     /**
      * @brief Given the key, remove the corresponding key-value pair in the bucket.
      * @param key The key to be deleted.
      * @return True if the key exists, false otherwise.
      */
-    auto Remove(const K &key) -> bool;
+    // auto remove(const K &key) -> bool;
+    auto remove(const Node *node) -> bool;
 
     /**
      * @brief Insert the given key-value pair into the bucket.
@@ -154,7 +187,7 @@ private:
      * @param value The value to be inserted.
      * @return True if the key-value pair is inserted, false otherwise.
      */
-    auto Insert(const K &key, const V &value) -> bool;
+    auto insert(const K &key, const V &value) -> Node *;
 
    private:
     const size_t capcity_;
@@ -190,8 +223,8 @@ public:
       * iterator and const_iterators as friends.
       */
       friend class ExtendibleHashTable;
-      //friend class ExtendibleHashTableIterator<K, V, true>;
-    // friend class ExtendibleHashTableIterator<K, V, false>;
+      //friend class ExtendibleHashTableIterator<true>;
+    // friend class ExtendibleHashTableIterator<false>;
 
       /*
       * Conversion operator: converts any iterator (iterator or const_iterator) to a const_iterator.
@@ -253,7 +286,7 @@ public:
           node_ = node_->next; 
           if (node_ == nullptr) { // if you reach the end of the bucket, find the next bucket
               for (++bucket_index_; bucket_index_ < dir_->size(); ++bucket_index_) {
-                  node_ = (*dir_)[bucket_index_]->GetList();
+                  node_ = (*dir_)[bucket_index_]->getList();
                   if (node_ != nullptr) {
                       return *this;
                   }
@@ -323,6 +356,8 @@ public:
       bucket_index_(bucket_index),
       node_(node) { }
 
+       
+
   };
   
 
@@ -330,34 +365,11 @@ public:
 
 private:
 
-  // TODO(student): You may add additional private members and helper functions and remove the ones
-  // you don't need.
-
   int global_depth_;    // The global depth of the directory
   size_t bucket_size_;  // The size of a bucket
   int num_buckets_;     // The number of buckets in the hash table
   mutable std::shared_mutex mutex_;
   std::vector<std::shared_ptr<Bucket>> dir_;  // The directory of the hash table
 
-  // The following functions are completely optional, you can delete them if you have your own ideas.
-
-  /**
-   * @brief Redistribute the kv pairs in a full bucket.
-   * @param bucket The bucket to be redistributed.
-   */
-  auto RedistributeBucket(std::shared_ptr<Bucket> bucket) -> void;
-
-  /*****************************************************************
-   * Must acquire latch_ first before calling the below functions. *
-   *****************************************************************/
-
-  /**
-   * @brief For the given key, return the entry index in the directory where the key hashes to.
-   * @param key The key to be hashed.
-   * @return The entry index in the directory.
-   */
-  auto IndexOf(const K &key) -> size_t;
-
-  
 };
 

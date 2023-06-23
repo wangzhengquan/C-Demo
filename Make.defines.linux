@@ -25,7 +25,7 @@ DEST=$(ROOT)/build
 # DEST=.
 
 ifeq ($(DEBUG),y)
-  DEBUGFLAGS = -O -g # "-O" is needed to expand inlines
+  DEBUGFLAGS =  -ggdb  
 else
   DEBUGFLAGS = -O2
 endif
