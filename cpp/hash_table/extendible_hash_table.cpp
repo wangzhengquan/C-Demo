@@ -11,8 +11,8 @@
 
 
 template <typename K, typename V>
-EXTENDIBLE_HASH_TABLE_TYPE::ExtendibleHashTable(size_t bucket_size)
-    : global_depth_(0), bucket_size_(bucket_size), num_buckets_(1 << global_depth_) {
+EXTENDIBLE_HASH_TABLE_TYPE::ExtendibleHashTable(size_t bucket_size, int global_depth)
+    : bucket_size_(bucket_size), global_depth_(global_depth),  num_buckets_(1 << global_depth) {
   dir_.resize(num_buckets_);
   for (int i = 0; i < num_buckets_; i++) {
     dir_[i] = std::make_shared<Bucket>(bucket_size_, global_depth_);
@@ -24,7 +24,7 @@ template <typename InputIt>
 EXTENDIBLE_HASH_TABLE_TYPE::ExtendibleHashTable(InputIt first, InputIt last, size_t bucket_size) :
    ExtendibleHashTable(bucket_size) {
    for (auto iter = first; iter != last; ++iter) {
-      insert(iter->first, iter->second);
+      insert(*iter);
    }
 }
 
@@ -32,6 +32,57 @@ template <typename K, typename V>
 EXTENDIBLE_HASH_TABLE_TYPE::ExtendibleHashTable(std::initializer_list<ElementType> init, size_t bucket_size) :
    ExtendibleHashTable{init.begin(), init.end(), bucket_size} {
 }
+
+// copy constructor
+template <typename K, typename V>
+EXTENDIBLE_HASH_TABLE_TYPE::ExtendibleHashTable(const ExtendibleHashTable& other) :
+ExtendibleHashTable(other.bucket_size_, other.global_depth_) {
+  for(auto &pair : other){
+    insert(pair);
+  }
+}
+
+// move constructor
+template <typename K, typename V>
+EXTENDIBLE_HASH_TABLE_TYPE::ExtendibleHashTable(ExtendibleHashTable&& other) : 
+bucket_size_(other.bucket_size_), global_depth_(other.global_depth_),  num_buckets_(1 << other.global_depth_) {
+  dir_.resize(num_buckets_);
+  for (int i = 0; i < num_buckets_; i++) {
+    dir_[i] = other.dir_[i];  
+    other.dir_[i] = nullptr;
+  }
+  other.size_ = 0;
+}
+
+// copy assignment operator
+template <typename K, typename V>
+EXTENDIBLE_HASH_TABLE_TYPE& EXTENDIBLE_HASH_TABLE_TYPE::operator=(const ExtendibleHashTable& other){
+  if (this == &other)
+    return *this;
+  clear();
+  for(auto &pair : other){
+    insert(pair);
+  }
+  return *this;
+}
+
+// move assignment operator
+template <typename K, typename V>
+EXTENDIBLE_HASH_TABLE_TYPE& EXTENDIBLE_HASH_TABLE_TYPE::operator=(ExtendibleHashTable&& other) {
+  if (this == &other)
+    return *this;
+  bucket_size_ = other.bucket_size_;
+  global_depth_= other.global_depth_;
+  num_buckets_ = other.num_buckets_;
+  dir_.resize(num_buckets_);
+  for (int i = 0; i < num_buckets_; i++) {
+    dir_[i] = other.dir_[i];  
+    other.dir_[i] = nullptr;
+  }
+  other.size_ = 0;
+  return *this;
+}
+ 
 
 template <typename K, typename V>
 auto EXTENDIBLE_HASH_TABLE_TYPE::indexOf(const K &key) -> size_t {
@@ -59,7 +110,7 @@ auto EXTENDIBLE_HASH_TABLE_TYPE::getNumBuckets() const -> int {
 }
 
 template <typename K, typename V>
-auto EXTENDIBLE_HASH_TABLE_TYPE::find(const K &key) -> EXTENDIBLE_HASH_TABLE_TYPE::Iterator {
+auto EXTENDIBLE_HASH_TABLE_TYPE::find(const K &key) -> Iterator {
   std::shared_lock<std::shared_mutex> lock(mutex_);
   size_t bucket_index = indexOf(key);
   Node *node = dir_[bucket_index]->find(key);
@@ -73,28 +124,47 @@ auto EXTENDIBLE_HASH_TABLE_TYPE::find(const K &key) -> EXTENDIBLE_HASH_TABLE_TYP
 }
 
 template <typename K, typename V>
-auto EXTENDIBLE_HASH_TABLE_TYPE::remove(const K &key) -> bool {
+auto EXTENDIBLE_HASH_TABLE_TYPE::erase(const K &key) -> bool {
   std::unique_lock<std::shared_mutex> lock(mutex_);
   Iterator pos = find(key);
   if(pos == end()){
     return false;
   }
-  remove(pos);
+  erase(pos);
   return true;
 }
 
 template <typename K, typename V>
-auto EXTENDIBLE_HASH_TABLE_TYPE::remove(EXTENDIBLE_HASH_TABLE_TYPE::Iterator pos) -> EXTENDIBLE_HASH_TABLE_TYPE::Iterator {
+auto EXTENDIBLE_HASH_TABLE_TYPE::erase(EXTENDIBLE_HASH_TABLE_TYPE::Iterator pos) -> Iterator {
   std::unique_lock<std::shared_mutex> lock(mutex_);
   std::shared_ptr<Bucket> bucket = dir_[pos.bucket_index_];
   bucket->remove(pos++.node_);
+  size_--;
   return pos;
 }
 
+template <typename K, typename V>
+auto EXTENDIBLE_HASH_TABLE_TYPE::insert(const ElementType & pair) -> std::pair<Iterator, bool> {
+  return insert(pair.first, pair.second);
+}
+
+template <typename K, typename V>
+auto EXTENDIBLE_HASH_TABLE_TYPE::insert(const K &key, const V &value) -> std::pair<Iterator, bool> {
+  Iterator pos = find(key);
+  if(pos != end()){
+    return {pos, false};
+  }
+  return insert_or_assign(key, value);
+}
+
+template <typename K, typename V>
+auto EXTENDIBLE_HASH_TABLE_TYPE::insert_or_assign(const ElementType & pair) -> std::pair<Iterator, bool> {
+  return insert_or_assign(pair.first, pair.second);
+}
 
 
 template <typename K, typename V>
-auto EXTENDIBLE_HASH_TABLE_TYPE::insert(const K &key, const V &value) -> std::pair<EXTENDIBLE_HASH_TABLE_TYPE::Iterator, bool> {
+auto EXTENDIBLE_HASH_TABLE_TYPE::insert_or_assign(const K &key, const V &value) -> std::pair<Iterator, bool> {
   std::unique_lock<std::shared_mutex> lock(mutex_);
   int old_num_buckets_ = num_buckets_;
   // std::cout << "insert(" << key <<"," << value << ")"<< std::endl;
@@ -116,7 +186,7 @@ auto EXTENDIBLE_HASH_TABLE_TYPE::insert(const K &key, const V &value) -> std::pa
     int local_hight_bit = 1 << (bucket->getDepth());
     for(Node *node = bucket->list_; node != nullptr; node = node->next){
       std::shared_ptr<Bucket> new_buket = (std::hash<K>()(node->value.first) & local_hight_bit) == 0 ? bucket0 : bucket1;
-      new_buket->insert(node->value.first, node->value.second);
+      new_buket->insert_or_assign(node->value.first, node->value.second);
     }
 
     for (int i = std::hash<K>()(key) & (local_hight_bit - 1); i < num_buckets_; i += local_hight_bit) {
@@ -126,34 +196,92 @@ auto EXTENDIBLE_HASH_TABLE_TYPE::insert(const K &key, const V &value) -> std::pa
 
   size_t bucket_index = indexOf(key);
   bucket = dir_[bucket_index];
-  Node *node = bucket->insert(key, value);
+  auto [node, is_insert] = bucket->insert_or_assign(key, value);
   if(node == nullptr){
     return {end(), false};
   } else {
-    return {Iterator(&dir_, bucket_index, node), true};
+    if(is_insert)
+      size_++;
+    return {Iterator(&dir_, bucket_index, node), is_insert};
   }
 }
 
+template <typename K, typename V>
+auto EXTENDIBLE_HASH_TABLE_TYPE::empty() const -> bool {
+  // return size_ == 0;
+  return cbegin() == cend();
+}
  
 
 template <typename K, typename V>
-auto EXTENDIBLE_HASH_TABLE_TYPE::begin() -> EXTENDIBLE_HASH_TABLE_TYPE::Iterator {
+void EXTENDIBLE_HASH_TABLE_TYPE::clear() {
+  // for (int i = 0; i < num_buckets_; i++) {
+  //   // delete old Bucket
+  //   dir_[i] = nullptr;
+  // }
+  global_depth_ = 0;
+  num_buckets_ = (1 << global_depth_);
+  dir_.resize(num_buckets_);
+  for (int i = 0; i < num_buckets_; i++) {
+    dir_[i] = std::make_shared<Bucket>(bucket_size_, global_depth_);
+  }
+  size_=0;
+  
+}
+
+template <typename K, typename V>
+auto EXTENDIBLE_HASH_TABLE_TYPE::at(const K& key) -> V&{
+  Iterator it = find(key);
+  if(it == end()){
+     throw std::out_of_range("at: key not found");
+  }
+  return it->second;
+     
+}
+
+template <typename K, typename V>
+auto EXTENDIBLE_HASH_TABLE_TYPE::at(const K& key) const -> const V& {
+  ConstIterator it = const_cast<EXTENDIBLE_HASH_TABLE_TYPE*>(this)->find(key);
+  if(it == cend()){
+     throw std::out_of_range("at: key not found");
+  }
+  return it->second;
+}
+
+template <typename K, typename V>
+auto EXTENDIBLE_HASH_TABLE_TYPE::begin() -> Iterator {
   return EXTENDIBLE_HASH_TABLE_TYPE::Iterator(&dir_, 0, dir_[0]->getList());
 }
 
 template <typename K, typename V>
-auto EXTENDIBLE_HASH_TABLE_TYPE::end() -> EXTENDIBLE_HASH_TABLE_TYPE::Iterator {
+auto EXTENDIBLE_HASH_TABLE_TYPE::end() -> Iterator {
   return EXTENDIBLE_HASH_TABLE_TYPE::Iterator(&dir_, dir_.size(), nullptr);
 }
 
 template <typename K, typename V>
-auto EXTENDIBLE_HASH_TABLE_TYPE::cbegin() const -> EXTENDIBLE_HASH_TABLE_TYPE::ConstIterator{
+auto EXTENDIBLE_HASH_TABLE_TYPE::begin() const -> ConstIterator{
+  return cbegin();
+}
+
+template <typename K, typename V>
+auto EXTENDIBLE_HASH_TABLE_TYPE::end() const -> ConstIterator{
+  return cend();
+}
+
+template <typename K, typename V>
+auto EXTENDIBLE_HASH_TABLE_TYPE::cbegin() const -> ConstIterator{
   return static_cast<EXTENDIBLE_HASH_TABLE_TYPE::ConstIterator>(const_cast<EXTENDIBLE_HASH_TABLE_TYPE*>(this)->begin());
 }
 
 template <typename K, typename V>
-auto EXTENDIBLE_HASH_TABLE_TYPE::cend() const -> EXTENDIBLE_HASH_TABLE_TYPE::ConstIterator{
+auto EXTENDIBLE_HASH_TABLE_TYPE::cend() const -> ConstIterator{
   return static_cast<EXTENDIBLE_HASH_TABLE_TYPE::ConstIterator>(const_cast<EXTENDIBLE_HASH_TABLE_TYPE*>(this)->end());
+}
+
+
+template <typename K, typename V>
+auto EXTENDIBLE_HASH_TABLE_TYPE::operator[](const K& key) -> V& {
+   return insert({key, {}}).first->second;
 }
 
 template <typename K, typename V>
@@ -178,6 +306,23 @@ template <typename K, typename V>
 EXTENDIBLE_HASH_TABLE_TYPE::Bucket::Bucket(size_t capcity, int depth) : capcity_(capcity), depth_(depth) {}
 
 template <typename K, typename V>
+EXTENDIBLE_HASH_TABLE_TYPE::Bucket::~Bucket(){
+  clear();
+}
+
+template <typename K, typename V>
+void EXTENDIBLE_HASH_TABLE_TYPE::Bucket::clear(){
+  Node *node = list_;
+  while (node != nullptr) {
+    auto temp = node;
+    node = node->next;
+    delete temp;
+  }
+  size_ = 0;
+  depth_ = 0;
+}
+
+template <typename K, typename V>
 auto EXTENDIBLE_HASH_TABLE_TYPE::Bucket::find(const K &key) -> Node * {
   for( Node *node = list_; node != nullptr; node = node->next){
     if(node->value.first == key ){
@@ -188,22 +333,9 @@ auto EXTENDIBLE_HASH_TABLE_TYPE::Bucket::find(const K &key) -> Node * {
   return nullptr;
 }
 
-// template <typename K, typename V>
-// auto EXTENDIBLE_HASH_TABLE_TYPE::Bucket::remove(const K &key) -> bool {
-//   for( Node *node = list_, *pre = nullptr; node != nullptr; node = node->next){
-//     if(node->value.first == key ){
-//       pre == nullptr ? list_ = nullptr : pre->next = node->next;
-//       delete node;
-//       size_--;
-//       return true;
-//     }
-//     pre = node;
-//   }
-//   return false;
-// }
 
 template <typename K, typename V>
-auto EXTENDIBLE_HASH_TABLE_TYPE::Bucket::remove(const EXTENDIBLE_HASH_TABLE_TYPE::Node *node) -> bool {
+auto EXTENDIBLE_HASH_TABLE_TYPE::Bucket::remove(const Node *node) -> bool {
   if(node->pre != nullptr){
     node->pre->next = node->next;
   } 
@@ -223,12 +355,11 @@ auto EXTENDIBLE_HASH_TABLE_TYPE::Bucket::remove(const EXTENDIBLE_HASH_TABLE_TYPE
 }
 
 template <typename K, typename V>
-auto EXTENDIBLE_HASH_TABLE_TYPE::Bucket::insert(const K &key, const V &value) -> EXTENDIBLE_HASH_TABLE_TYPE::Node* {
+auto EXTENDIBLE_HASH_TABLE_TYPE::Bucket::insert_or_assign(const K &key, const V &value) -> std::pair<Node*, bool> {
   for( Node *node = list_; node != nullptr; node = node->next){
     if(node->value.first == key ){
       node->value.second = value;
-      size_++;
-      return node;
+      return {node, false};
     }
   }
   if (!isFull()) {
@@ -239,10 +370,10 @@ auto EXTENDIBLE_HASH_TABLE_TYPE::Bucket::insert(const K &key, const V &value) ->
     
     list_ = node;
     size_++;
-    return node;
+    return {node, true};
   }
 
-  return nullptr;
+  return {nullptr, false};
 }
 
 

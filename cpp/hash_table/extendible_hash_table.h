@@ -53,13 +53,22 @@ public:
    * @brief Create a new ExtendibleHashTable.
    * @param bucket_size: fixed size for each bucket
    */
-  explicit ExtendibleHashTable(size_t bucket_size = DEFAULT_BUCKET_SIZE);
+  explicit ExtendibleHashTable(size_t bucket_size = DEFAULT_BUCKET_SIZE, int global_depth = 0);
 
   template <typename InputIt>
   ExtendibleHashTable(InputIt first, InputIt last, size_t bucket_size = DEFAULT_BUCKET_SIZE);
 
   ExtendibleHashTable(std::initializer_list<ElementType> init, size_t bucket_size = DEFAULT_BUCKET_SIZE);
 
+  // copy constructor
+  ExtendibleHashTable(const ExtendibleHashTable& other);
+  // move constructor
+  ExtendibleHashTable(ExtendibleHashTable&& other) ;
+
+  // copy assignment operator
+  ExtendibleHashTable& operator=(const ExtendibleHashTable& other);
+  // move assignment operator
+  ExtendibleHashTable& operator=(ExtendibleHashTable&& other) ;
   /**
    *
    * @brief Find the value associated with the given key.
@@ -86,6 +95,10 @@ public:
    * @param value The value to be inserted.
    */
   auto insert(const K &key, const V &value) -> std::pair<Iterator, bool>;
+  auto insert(const ElementType & pair) -> std::pair<Iterator, bool> ;
+
+  auto insert_or_assign(const K &key, const V &value) -> std::pair<Iterator, bool>;
+  auto insert_or_assign(const ElementType & pair) -> std::pair<Iterator, bool> ;
 
   /**
    * @brief Given the key, remove the corresponding key-value pair in the hash table.
@@ -93,14 +106,24 @@ public:
    * @param key The key to be deleted.
    * @return True if the key exists, false otherwise.
    */
-  auto remove(const K &key) -> bool ;
-  auto remove(Iterator pos) -> Iterator ;
+  auto erase(const K &key) -> bool ;
+  auto erase(Iterator pos) -> Iterator ;
+
+  auto empty() const -> bool ;
+  inline auto size() const -> size_t {return size_;}
+  void clear();
+  auto at(const K& key)  -> V& ;
+  auto at(const K& key) const -> const V&;
 
   auto begin() -> Iterator;
   auto end() -> Iterator;
 
+  auto begin() const -> ConstIterator;
+  auto end() const -> ConstIterator;
+
   auto cbegin() const -> ConstIterator;
   auto cend() const -> ConstIterator;
+  auto operator[](const K& key) -> V&;
 
   void show();
 
@@ -150,6 +173,8 @@ private:
    public:
     friend class ExtendibleHashTable;
     explicit Bucket(size_t capcity, int depth = 0);
+    ~Bucket();
+
 
     /** @brief Check if a bucket is full. */
     inline auto isFull() const -> bool { return size_ >= capcity_; }
@@ -187,7 +212,9 @@ private:
      * @param value The value to be inserted.
      * @return True if the key-value pair is inserted, false otherwise.
      */
-    auto insert(const K &key, const V &value) -> Node *;
+    auto insert_or_assign(const K &key, const V &value) -> std::pair<Node *, bool>;
+
+    void clear();
 
    private:
     const size_t capcity_;
@@ -308,7 +335,8 @@ public:
       *      if (iter == map.end()) {...};
       */
       friend bool operator==(const ExtendibleHashTableIterator& lhs, const ExtendibleHashTableIterator& rhs){
-        return lhs.bucket_index_ == rhs.bucket_index_ && lhs.node_ == rhs.node_;
+        // return lhs.bucket_index_ == rhs.bucket_index_ && lhs.node_ == rhs.node_;
+        return lhs.node_ == rhs.node_;
       }
 
       /*
@@ -356,20 +384,14 @@ public:
       bucket_index_(bucket_index),
       node_(node) { }
 
-       
-
   };
   
-
-  
-
 private:
-
-  int global_depth_;    // The global depth of the directory
   size_t bucket_size_;  // The size of a bucket
+  int global_depth_;    // The global depth of the directory
   int num_buckets_;     // The number of buckets in the hash table
   mutable std::shared_mutex mutex_;
   std::vector<std::shared_ptr<Bucket>> dir_;  // The directory of the hash table
-
+  size_t size_ = 0;
 };
 
