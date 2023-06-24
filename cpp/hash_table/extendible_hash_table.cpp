@@ -12,8 +12,17 @@
 
 template <typename K, typename V>
 EXTENDIBLE_HASH_TABLE_TYPE::ExtendibleHashTable(size_t bucket_size, int global_depth)
-    : bucket_size_(bucket_size), global_depth_(global_depth),  num_buckets_(1 << global_depth) {
-  dir_.resize(num_buckets_);
+    : bucket_size_(bucket_size), 
+      global_depth_(global_depth),  
+      num_buckets_(1 << global_depth),
+      dir_(num_buckets_) {
+
+  // int reserve_size = 8;
+  // if(reserve_size > num_buckets_) {
+  //   dir_.reserve(reserve_size);
+  // }
+  
+   
   for (int i = 0; i < num_buckets_; i++) {
     dir_[i] = std::make_shared<Bucket>(bucket_size_, global_depth_);
   }
@@ -286,17 +295,19 @@ auto EXTENDIBLE_HASH_TABLE_TYPE::operator[](const K& key) -> V& {
 
 template <typename K, typename V>
 void EXTENDIBLE_HASH_TABLE_TYPE::show() {
+  std::cout << "===============Table Structure=======================" << std::endl;
   std::cout << "Gloable depth = " << global_depth_ << std::endl;
   for (int i = 0; i < num_buckets_; i++) {
     std::shared_ptr<Bucket> bucket = dir_[i];
     std::bitset<4> bits(i);
-    std::cout << bits << "(" << bucket->getDepth() << ")"
-              << ":";
+    std::cout << bits << "(depth=" << bucket->getDepth() << ")" << " : ";
+              
     for(Node *node = bucket->list_; node != nullptr; node = node->next){
-      std::cout << node->value.first << ", ";
+      std::cout << "(" << node->value.first << ", " << node->value.second << ") ";
     }
     std::cout << std::endl;
   }
+  std::cout << "=====================================================" << std::endl;
 }
 
 //===--------------------------------------------------------------------===//
@@ -307,6 +318,7 @@ EXTENDIBLE_HASH_TABLE_TYPE::Bucket::Bucket(size_t capcity, int depth) : capcity_
 
 template <typename K, typename V>
 EXTENDIBLE_HASH_TABLE_TYPE::Bucket::~Bucket(){
+  // std::cout << "~Bucket" << std::endl;
   clear();
 }
 
@@ -379,4 +391,5 @@ auto EXTENDIBLE_HASH_TABLE_TYPE::Bucket::insert_or_assign(const K &key, const V 
 
 template class ExtendibleHashTable<int, std::string>;
 template class ExtendibleHashTable<int, int>;
+template class ExtendibleHashTable<std::string, int>;
 

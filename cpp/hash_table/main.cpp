@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <memory>
+#include <unordered_map>
 #include "extendible_hash_table.h"
 using std::cin;
 using std::cout;
@@ -72,6 +73,47 @@ void test()
   table.erase(31);
   ASSERT(table.find(31) == table.end(), "remove failed");
   table.show();
+  table.clear();
+}
+
+void test_at() {
+	std::cout << "----test2---- " << std::endl;
+	ExtendibleHashTable<int, std::string> map =
+	 {
+	     {1, "one" }, {2, "two" }, {3, "three"},
+	     {4, "four"}, {5, "five"}, {6, "six"  }
+	 };
+   map.show();
+
+  try
+  {
+  	std::cout << "map.at(1) =  " <<  map.at(1) << std::endl;
+   map.at(1) = "hello one";
+   std::cout << "map.at(1) =  " <<  map.at(1) << std::endl;
+   // map.show();
+  }
+  catch (const std::exception& e)
+  {
+    cout << e.what() << '\n';
+  }
+
+  try
+  {
+  	// std::cout << " map.at(10) =  " <<  map.at(10) << std::endl;
+   map.at(10) = "world";
+   // std::cout << " map.at(10) =  " <<  map.at(10) << std::endl;
+   // map.show();
+   std::cout << "  after  exception " << std::endl;
+  }
+  catch (const std::exception& e)
+  {
+    cout << e.what() << '\n';
+  }
+
+  std::cout << "map[6] =  " <<  map[6] << std::endl;
+  map[7] = "seven";
+  std::cout << "map[7] =  " <<  map[7] << std::endl;
+  
 }
 
 void test_remove() {
@@ -104,8 +146,42 @@ void test_remove() {
     std::cout << std::endl;
 }
 
+ 
+void test_move_assiment() {
+	 std::cout << "----test_move---- " << std::endl;
+    ExtendibleHashTable<std::string, int> map1 {{"A", 1}, {"B", 2}};
+    ExtendibleHashTable<std::string, int> map2 {{"C", 3}};
+
+    std::unordered_map<std::string, int> answer1 {{"A", 1}, {"B", 2}};
+    std::unordered_map<std::string, int> answer2 {{"C", 3}};
+
+    map1 = std::move(map2) = std::move(map2) = std::move(map1);
+    // map1 = std::move(map2) =  std::move(map1);
+    for (auto& p : map1){
+        std::cout << "(" << p.first << "," << p.second << ") ";
+    }
+     std::cout << std::endl;
+
+    answer1 = std::move(answer2) = std::move(answer2) = std::move(answer1);
+    for (auto& p : answer1){
+        std::cout << "(" << p.first << "," << p.second << ") ";
+    }
+    std::cout << std::endl;
+}
+
 int main(){
   test();
   
   test_remove();
+  test_at();
+  test_move_assiment();
+	ExtendibleHashTable<int, std::string> c =
+    {
+        {1, "one" }, {2, "two" }, {3, "three"},
+        {4, "four"}, {5, "five"}, {6, "six"  }
+    };
+    c.show();
+
+    
+   std::cout << std::endl;
 }
