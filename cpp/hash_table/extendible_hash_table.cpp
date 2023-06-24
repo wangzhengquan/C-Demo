@@ -119,6 +119,11 @@ auto EXTENDIBLE_HASH_TABLE_TYPE::getNumBuckets() const -> int {
 }
 
 template <typename K, typename V>
+auto EXTENDIBLE_HASH_TABLE_TYPE::find(const K &key) const -> ConstIterator {
+  return static_cast<ConstIterator>(const_cast<EXTENDIBLE_HASH_TABLE_TYPE*>(this)->find(key));
+}
+
+template <typename K, typename V>
 auto EXTENDIBLE_HASH_TABLE_TYPE::find(const K &key) -> Iterator {
   std::shared_lock<std::shared_mutex> lock(mutex_);
   size_t bucket_index = indexOf(key);
@@ -250,7 +255,7 @@ auto EXTENDIBLE_HASH_TABLE_TYPE::at(const K& key) -> V&{
 
 template <typename K, typename V>
 auto EXTENDIBLE_HASH_TABLE_TYPE::at(const K& key) const -> const V& {
-  ConstIterator it = const_cast<EXTENDIBLE_HASH_TABLE_TYPE*>(this)->find(key);
+  ConstIterator it = find(key);
   if(it == cend()){
      throw std::out_of_range("at: key not found");
   }
@@ -295,11 +300,11 @@ auto EXTENDIBLE_HASH_TABLE_TYPE::operator[](const K& key) -> V& {
 
 template <typename K, typename V>
 void EXTENDIBLE_HASH_TABLE_TYPE::show() {
-  std::cout << "===============Table Structure=======================" << std::endl;
+  std::cout << "---------- Table Structure -----------" << std::endl;
   std::cout << "Gloable depth = " << global_depth_ << std::endl;
   for (int i = 0; i < num_buckets_; i++) {
     std::shared_ptr<Bucket> bucket = dir_[i];
-    std::bitset<4> bits(i);
+    std::bitset<32> bits(i);
     std::cout << bits << "(depth=" << bucket->getDepth() << ")" << " : ";
               
     for(Node *node = bucket->list_; node != nullptr; node = node->next){
@@ -307,7 +312,7 @@ void EXTENDIBLE_HASH_TABLE_TYPE::show() {
     }
     std::cout << std::endl;
   }
-  std::cout << "=====================================================" << std::endl;
+  std::cout << "--------------------------------------" << std::endl;
 }
 
 //===--------------------------------------------------------------------===//

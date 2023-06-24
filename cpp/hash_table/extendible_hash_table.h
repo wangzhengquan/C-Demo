@@ -69,17 +69,21 @@ public:
   ExtendibleHashTable& operator=(const ExtendibleHashTable& other);
   // move assignment operator
   ExtendibleHashTable& operator=(ExtendibleHashTable&& other) ;
-  /**
+
+  /*
+   * Finds the element with the given key, and returns an iterator to that element.
+   * If an element is not found, an iterator to end() is returned.
    *
-   * @brief Find the value associated with the given key.
+   * Parameters: const l-value reference to type K, the key we are looking for.
+   * Return value: iterator to the K/M element with given key.
    *
-   * Use IndexOf(key) to find the directory index the key hashes to.
+   * Usage:
+   *      auto iter = map.find(4);
+   *      iter->second = "Hello"; // sets whatever 4 was mapped to to "Hello".
    *
-   * @param key The key to be searched.
-   * @param[out] value The value associated with the key.
-   * @return True if the key is found, false otherwise.
    */
   auto find(const K &key) -> Iterator ;
+  auto find(const K &key) const -> ConstIterator;
 
   /**
    *
@@ -93,12 +97,20 @@ public:
    *
    * @param key The key to be inserted.
    * @param value The value to be inserted.
+   * @return The bool component is true if the insertion took place and false if the assignment took place. 
+   *         The iterator component is pointing at the element that was inserted or updated
+   */
+  auto insert_or_assign(const K &key, const V &value) -> std::pair<Iterator, bool>;
+  auto insert_or_assign(const ElementType & pair) -> std::pair<Iterator, bool> ;
+
+  /**
+   * 
+   * @return Returns a pair consisting of an iterator to the inserted element (or to the element that prevented the insertion) and a bool value set to true if and only if the insertion took place.
    */
   auto insert(const K &key, const V &value) -> std::pair<Iterator, bool>;
   auto insert(const ElementType & pair) -> std::pair<Iterator, bool> ;
 
-  auto insert_or_assign(const K &key, const V &value) -> std::pair<Iterator, bool>;
-  auto insert_or_assign(const ElementType & pair) -> std::pair<Iterator, bool> ;
+  
 
   /**
    * @brief Given the key, remove the corresponding key-value pair in the hash table.
@@ -210,7 +222,8 @@ private:
      *      2. If the bucket is full, do nothing and return false.
      * @param key The key to be inserted.
      * @param value The value to be inserted.
-     * @return True if the key-value pair is inserted, false otherwise.
+     * @return The bool component is true if the insertion took place and false if the assignment took place. 
+     *         The Node * component is pointing at the element that was inserted or updated
      */
     auto insert_or_assign(const K &key, const V &value) -> std::pair<Node *, bool>;
 
@@ -321,9 +334,9 @@ public:
           }
           return *this;
       }
-
+      // postfix
       ExtendibleHashTableIterator operator++(int){
-        auto tmp = *this; // calls the copy constructor to create copy
+        auto tmp = *this;  
         ++(*this);
         return tmp;
       }

@@ -12,7 +12,7 @@ void test()
 {
   // auto table = std::make_unique<ExtendibleHashTable<int, int>>(4);
   ExtendibleHashTable<int, int> table(4);
-  std::cout << "====Mytest" << std::endl;
+  std::cout << "=============Mytest=============" << std::endl;
   ASSERT(table.empty() , "assert empty");
   table.insert(16, 16);
   table.insert(4, 4);
@@ -25,10 +25,15 @@ void test()
   table.insert(9, 9);
   table.insert(20, 20);
   table.insert(26, 26);
-  table.insert({8, 8});
+  ASSERT(table.insert({8, 8}).second, "insert"  );
+  ASSERT(!table.insert({8, 88}).second, "insert"  );
+  ASSERT(table.insert_or_assign({5, 5}).second, "insert_or_assgin");
+  ASSERT(!table.insert_or_assign({5, 55}).second, "insert_or_assgin");
 
-
-  std::cout << "----print table ---- " << std::endl;
+  // for(int i=0; i< 10000; i++){
+  // 	table.insert_or_assign(i, i);
+  // }
+   
   table.show();
 
 
@@ -77,7 +82,7 @@ void test()
 }
 
 void test_at() {
-	std::cout << "----test2---- " << std::endl;
+	std::cout << "=============test_at============= " << std::endl;
 	ExtendibleHashTable<int, std::string> map =
 	 {
 	     {1, "one" }, {2, "two" }, {3, "three"},
@@ -116,8 +121,8 @@ void test_at() {
   
 }
 
-void test_remove() {
-	std::cout << "----test_remove---- " << std::endl;
+void test_erase() {
+	std::cout << "============= test erase =============" << std::endl;
    ExtendibleHashTable<int, std::string> c =
     {
         {1, "one" }, {2, "two" }, {3, "three"},
@@ -148,7 +153,7 @@ void test_remove() {
 
  
 void test_move_assiment() {
-	 std::cout << "----test_move---- " << std::endl;
+	 std::cout << "=============test_move_assiment=============" << std::endl;
     ExtendibleHashTable<std::string, int> map1 {{"A", 1}, {"B", 2}};
     ExtendibleHashTable<std::string, int> map2 {{"C", 3}};
 
@@ -160,7 +165,15 @@ void test_move_assiment() {
     for (auto& p : map1){
         std::cout << "(" << p.first << "," << p.second << ") ";
     }
-     std::cout << std::endl;
+    std::cout << std::endl;
+
+    ExtendibleHashTable<std::string, int> map3;
+    map3 = std::move(map2) = std::move(map2) = std::move(map1);
+    for (auto& p : map3){
+        std::cout << "(" << p.first << "," << p.second << ") ";
+    }
+    std::cout << std::endl;
+
 
     answer1 = std::move(answer2) = std::move(answer2) = std::move(answer1);
     for (auto& p : answer1){
@@ -169,19 +182,57 @@ void test_move_assiment() {
     std::cout << std::endl;
 }
 
-int main(){
-  test();
-  
-  test_remove();
-  test_at();
-  test_move_assiment();
-	ExtendibleHashTable<int, std::string> c =
+void test_copy_assiment() {
+	std::cout << "=============test_copy_assiment=============" << std::endl;
+	ExtendibleHashTable<int, std::string> map1 =
     {
         {1, "one" }, {2, "two" }, {3, "three"},
         {4, "four"}, {5, "five"}, {6, "six"  }
     };
-    c.show();
 
-    
-   std::cout << std::endl;
+    ExtendibleHashTable<int, std::string> map2;
+
+    map2 = map1;
+    map2.show();
+    for (auto& p : map1){
+        std::cout << "(" << p.first << "," << p.second << ") ";
+    }
+    std::cout << std::endl;
+
+}
+
+void test_copy_and_move_constructor() {
+	std::cout << "=============test_copy_and_move_constructor=============" << std::endl;
+	ExtendibleHashTable<int, std::string> map =
+    {
+        {1, "one" }, {2, "two" }, {3, "three"},
+        {4, "four"}, {5, "five"}, {6, "six"  }
+    };
+
+    ExtendibleHashTable<int, std::string> map1=map;
+
+   
+    for (auto& p : map1){
+        std::cout << "(" << p.first << "," << p.second << ") ";
+    }
+    std::cout << std::endl;
+
+    ExtendibleHashTable<int, std::string> map2 = std::move(map1);
+    for (auto& p : map2){
+        std::cout << "(" << p.first << "," << p.second << ") ";
+    }
+    std::cout << std::endl;
+    map2.show();
+
+}
+
+int main(){
+  test();
+  
+  test_erase();
+  test_at();
+  test_move_assiment();
+  test_copy_assiment();
+  test_copy_and_move_constructor();
+	 
 }
