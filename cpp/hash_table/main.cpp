@@ -73,10 +73,10 @@ void test()
   auto it2 = table.find(10);
   std::cout << "find " << it2->first << std::endl;
   table.erase(it2);
-  ASSERT(table.find(10) == table.end(), "remove failed");
+  ASSERT(!table.contains(10) , "remove failed");
 
   table.erase(31);
-  ASSERT(table.find(31) == table.end(), "remove failed");
+  ASSERT(!table.contains(31) , "remove failed");
   table.show();
   table.clear();
 }
@@ -226,6 +226,33 @@ void test_copy_and_move_constructor() {
 
 }
 
+
+
+void test_clear() {
+  std::cout << "=============test_clear=============" << std::endl;
+  ExtendibleHashTable<int, std::string> map =
+    {
+        {1, "one" }, {2, "two" }, {3, "three"},
+        {4, "four"}, {5, "five"}, {6, "six"  }
+    };
+
+    std::cout << "before clear " << std::endl;
+    for (auto& p : map){
+        std::cout << "(" << p.first << "," << p.second << ") ";
+    }
+    std::cout << std::endl;
+    map.show();
+    map.clear();
+    std::cout << "after clear " << std::endl;
+    for (auto& p : map){
+        std::cout << "(" << p.first << "," << p.second << ") ";
+    }
+    std::cout << std::endl;
+    map.show();
+
+    
+}
+
 int main(){
   test();
   
@@ -234,5 +261,6 @@ int main(){
   test_move_assiment();
   test_copy_assiment();
   test_copy_and_move_constructor();
+	test_clear();
 	 
 }

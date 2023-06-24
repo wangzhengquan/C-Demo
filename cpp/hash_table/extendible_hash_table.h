@@ -85,6 +85,8 @@ public:
   auto find(const K &key) -> Iterator ;
   auto find(const K &key) const -> ConstIterator;
 
+  
+
   /**
    *
    * @brief Insert the given key-value pair into the hash table.
@@ -123,6 +125,7 @@ public:
 
   auto empty() const -> bool ;
   inline auto size() const -> size_t {return size_;}
+  inline auto contains(const K& key) const ->bool { return find(key) != end();}
   void clear();
   auto at(const K& key)  -> V& ;
   auto at(const K& key) const -> const V&;
