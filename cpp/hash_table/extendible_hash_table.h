@@ -127,6 +127,24 @@ public:
   inline auto size() const -> size_t {return size_;}
   inline auto contains(const K& key) const ->bool { return find(key) != end();}
   void clear();
+  /*
+  * Returns a l-value reference to the mapped value given a key.
+  * If no such element exists, throws exception of type std::out_of_range.
+  *
+  * Parameters: key of type K.
+  * Return value: l-value reference to type V, the mapped value of key.
+  *
+  * Usage:
+  *      map.at(3) = "Avery";            // assuming {3, "Avery"} is in the map.
+  *      std::string s = map.at(3);      // s = "Avery"
+  *
+  * Exceptions: std::out_of_range if key is not in the map.
+  *
+  *
+  * Notes: recall that operator[], which you will implement, does not throw exceptions,
+  * if a key is not found. Instead, it will create a K/M pair for that key with a default
+  * mapped value. This function is also not const-correct, which you will fix in milestone 2.
+  */
   auto at(const K& key)  -> V& ;
   auto at(const K& key) const -> const V&;
 
@@ -138,6 +156,20 @@ public:
 
   auto cbegin() const -> ConstIterator;
   auto cend() const -> ConstIterator;
+
+  /*
+   * Indexing operator
+   * Retrieves a reference to the mapped value corresponding to this key.
+   * If no such key exists, a key/mapped value pair will be added to the HashMap.
+   * The mapped value will have the default value for type M.
+   *
+   * Usage:
+   *      HashMap<int, std::string> map;
+   *      map[3] = "Avery"; // creates the pair {3, "Avery"}
+   *      auto name = map[3]; // name is now "Avery"
+   *      auto name2 = map[4]; // creates the pair {4, ""}, name2 is now ""
+   *
+   */
   auto operator[](const K& key) -> V&;
 
   void show();
