@@ -39,7 +39,6 @@ class ExtendibleHashTable  {
 private:
   class Bucket;
 
-public:
   template <bool>
   class ExtendibleHashTableIterator;
 
@@ -47,8 +46,11 @@ public:
   friend class ExtendibleHashTableIterator;
 
   using ElementType = std::pair<K, V>;
+
+public:
   using Iterator =  ExtendibleHashTableIterator<false>;
   using ConstIterator =  ExtendibleHashTableIterator<true>;
+ 
   /**
    * @brief Create a new ExtendibleHashTable.
    * @param bucket_size: fixed size for each bucket
@@ -172,9 +174,8 @@ public:
    */
   auto operator[](const K& key) -> V&;
 
+  // friend std::ostream& operator<<(std::ostream& os, const ExtendibleHashTable& obj);
 
-  // friend std::ostream& operator<<(std::ostream& os, const ExtendibleHashTable<K, V>& obj);
- 
   friend std::ostream& operator<<(std::ostream& os, const ExtendibleHashTable& obj)
   {
     for (auto  it = obj.begin(); it != obj.end(); ++it) {
@@ -275,14 +276,13 @@ private:
 
     void clear();
 
-   private:
     const size_t capcity_;
     size_t size_ = 0;
     int depth_;
     Node *list_ = nullptr;
   };
 
-public:
+private:
   template <bool IsConst = false>
   class ExtendibleHashTableIterator {
 
@@ -309,8 +309,6 @@ public:
       * iterator and const_iterators as friends.
       */
       friend class ExtendibleHashTable;
-      //friend class ExtendibleHashTableIterator<true>;
-    // friend class ExtendibleHashTableIterator<false>;
 
       /*
       * Conversion operator: converts any iterator (iterator or const_iterator) to a const_iterator.
@@ -368,22 +366,8 @@ public:
       *
       * Note that incrementing an invalid or end() iterator is undefined behavior.
       */
-      ExtendibleHashTableIterator& operator++(){
-          node_ = node_->next; 
-          if (node_ == nullptr) { // if you reach the end of the bucket, find the next bucket
-              for (++bucket_index_; bucket_index_ < dir_->size(); ++bucket_index_) {
-                  std::shared_ptr<Bucket> bucket = (*dir_)[bucket_index_];
-                  size_t local_hight_bit = 1 << (bucket->getDepth());
-                  if(bucket_index_ < local_hight_bit) {
-                    node_ = bucket->getList();
-                    if (node_ != nullptr) {
-                        return *this;
-                    }
-                  }
-              }
-          }
-          return *this;
-      }
+      ExtendibleHashTableIterator& operator++();
+       
       // postfix
       ExtendibleHashTableIterator operator++(int){
         auto tmp = *this;  
@@ -412,6 +396,17 @@ public:
         return !(*this == other);
       }
 
+      ExtendibleHashTableIterator(std::vector<std::shared_ptr<Bucket> > * dir, size_t bucket_index, Node * node) : 
+      dir_(dir),
+      bucket_index_(bucket_index),
+      node_(node) { 
+        if(bucket_index < dir->size()){
+          std::shared_ptr<Bucket> bucket = (*dir)[bucket_index];
+          size_t local_hight_bit = 1 << (bucket->getDepth());
+          bucket_index_ = bucket_index & (local_hight_bit - 1);
+        }
+      }
+
       /*
       * Special member functions: we explicitly state that we want the default compiler-generated functions.
       * Here we are following the rule of zero. You should think about why that is correct.
@@ -423,38 +418,16 @@ public:
       ExtendibleHashTableIterator& operator=(ExtendibleHashTableIterator&& rhs) = default;
 
 
-  private:
       /*
-      * Instance variable: a pointer to the _buckets_array of the HashMap this iterator is for.
-      */
+       * Instance variable: a pointer to the _buckets_array of the HashMap this iterator is for.
+       */
       std::vector<std::shared_ptr<Bucket> > * dir_;
       
       /*
-      * Instance variable: the index of the bucket that bucket is in.
-      */
+       * Instance variable: the index of the bucket that bucket is in.
+       */
       size_t bucket_index_;
       Node * node_;
-
-      /*
-      * Private constructor for a ExtendibleHashTableIterator.
-      * Friend classes can access the private members of class it is friends with, 
-      * so HashMap is able to call ExtendibleHashTableIterator's private constructor 
-      * (e.g, in begin()). We want the ExtendibleHashTableIterator constructor to be private 
-      * so a client can't randomly construct a ExtendibleHashTableIterator without asking for one 
-      * through the HashMap's interface.
-      */
-      ExtendibleHashTableIterator(std::vector<std::shared_ptr<Bucket> > * dir, size_t bucket_index, Node * node) : 
-      dir_(dir),
-      bucket_index_(bucket_index),
-      node_(node) { 
-        if(bucket_index < dir->size()){
-          std::shared_ptr<Bucket> bucket = (*dir)[bucket_index];
-          size_t local_hight_bit = 1 << (bucket->getDepth());
-          bucket_index_ = bucket_index & (local_hight_bit - 1);
-        }
-      }
-        
-
   };
   
 private:
@@ -465,4 +438,38 @@ private:
   std::vector<std::shared_ptr<Bucket>> dir_;  // The directory of the hash table
   size_t size_ = 0;
 };
+
+
+
+
+// ========================= Implemention =====================================
+
+template <typename K, typename V>
+inline auto EXTENDIBLE_HASH_TABLE_TYPE::empty() const -> bool {
+  // return size_ == 0;
+  return cbegin() == cend();
+}
+
+template <typename K, typename V>
+template <bool IsConst>
+EXTENDIBLE_HASH_TABLE_TYPE::ExtendibleHashTableIterator<IsConst>& EXTENDIBLE_HASH_TABLE_TYPE::ExtendibleHashTableIterator<IsConst>::operator++(){
+  node_ = node_->next; 
+  if (node_ == nullptr) { // if you reach the end of the bucket, find the next bucket
+      for (++bucket_index_; bucket_index_ < dir_->size(); ++bucket_index_) {
+          std::shared_ptr<Bucket> bucket = (*dir_)[bucket_index_];
+          size_t local_hight_bit = 1 << (bucket->getDepth());
+          if(bucket_index_ < local_hight_bit) {
+            node_ = bucket->getList();
+            if (node_ != nullptr) {
+                return *this;
+            }
+          }
+      }
+  }
+  return *this;
+}
+
+ 
+
+
 

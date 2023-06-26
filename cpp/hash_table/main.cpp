@@ -71,9 +71,12 @@ void test()
 
 
   std::cout << "----iterator first ---- " << std::endl;
-  ExtendibleHashTable<int, int>::Iterator it = table.begin();
-  ExtendibleHashTable<int, int>::ConstIterator cit = it;
-  std::cout << cit->first << "\n ";
+  ExtendibleHashTable<int, int>::Iterator it1 = table.begin();
+  std::cout << it1->first << "\n ";
+  auto it2 = table.begin();
+  std::cout << it2->first << "\n ";
+  ExtendibleHashTable<int, int>::ConstIterator cit1 = it2;
+  std::cout << cit1->first << "\n ";
  
  
   std::cout << "----iterator---- " << std::endl;
@@ -93,9 +96,9 @@ void test()
   std::cout << std::endl;
 
   std::cout << "----remove---- " << std::endl;
-  auto it2 = table.find(10);
-  std::cout << "find " << it2->first << std::endl;
-  table.erase(it2);
+  auto it10 = table.find(10);
+  std::cout << "find " << it10->first << std::endl;
+  table.erase(it10);
   ASSERT(!table.contains(10) , "remove failed");
 
   table.erase(31);
@@ -306,7 +309,7 @@ void test_clear() {
 }
 
 int main(){
-  // test();
+  test();
   
   test_erase();
   // test_at();

@@ -224,12 +224,7 @@ auto EXTENDIBLE_HASH_TABLE_TYPE::insert_or_assign(const K &key, const V &value) 
   }
 }
 
-template <typename K, typename V>
-auto EXTENDIBLE_HASH_TABLE_TYPE::empty() const -> bool {
-  // return size_ == 0;
-  return cbegin() == cend();
-}
- 
+
 
 template <typename K, typename V>
 void EXTENDIBLE_HASH_TABLE_TYPE::clear() {
@@ -319,7 +314,12 @@ void EXTENDIBLE_HASH_TABLE_TYPE::show() {
   std::cout << "--------------------------------------" << std::endl;
 }
 
- 
+
+// std::ostream& operator<<(std::ostream& os, const ExtendibleHashTable& obj){
+//   return os;
+
+// }
+
 
 //===--------------------------------------------------------------------===//
 // Bucket
