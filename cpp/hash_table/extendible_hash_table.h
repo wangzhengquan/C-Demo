@@ -172,6 +172,17 @@ public:
    */
   auto operator[](const K& key) -> V&;
 
+
+  // friend std::ostream& operator<<(std::ostream& os, const ExtendibleHashTable<K, V>& obj);
+ 
+  friend std::ostream& operator<<(std::ostream& os, const ExtendibleHashTable& obj)
+  {
+    for (auto  it = obj.begin(); it != obj.end(); ++it) {
+      os << "(" << it->first << ", " << it->second << ") ";
+    }
+    return os;
+  }
+
   void show();
 
 private:
@@ -386,9 +397,9 @@ public:
       * Usage:
       *      if (iter == map.end()) {...};
       */
-      friend bool operator==(const ExtendibleHashTableIterator& lhs, const ExtendibleHashTableIterator& rhs){
+      bool operator==(const ExtendibleHashTableIterator& other){
         // return lhs.bucket_index_ == rhs.bucket_index_ && lhs.node_ == rhs.node_;
-        return lhs.node_ == rhs.node_;
+        return node_ == other.node_;
       }
 
       /*
@@ -397,8 +408,8 @@ public:
       * Usage:
       *      if (iter != map.end()) {...};
       */
-      friend bool operator!=(const ExtendibleHashTableIterator& lhs, const ExtendibleHashTableIterator& rhs){
-        return !(lhs == rhs);
+      bool operator!=( const ExtendibleHashTableIterator& other){
+        return !(*this == other);
       }
 
       /*

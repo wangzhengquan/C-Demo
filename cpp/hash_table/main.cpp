@@ -12,9 +12,10 @@ using std::endl;
 template <typename K, typename V>
 void print_map(ExtendibleHashTable<K, V> map, std::string header="map"){
   std::cout << header << " : " ;
-  for (auto& p : map){
-    std::cout << "(" << p.first << "," << p.second << ") ";
-  }
+  // for (auto& p : map){
+  //   std::cout << "(" << p.first << "," << p.second << ") ";
+  // }
+  std::cout << map << std::endl;
   std::cout << std::endl;
   map.show();
 }
@@ -305,14 +306,14 @@ void test_clear() {
 }
 
 int main(){
-  test();
+  // test();
   
   test_erase();
   // test_at();
   // test_move_assiment();
   // test_copy_assiment();
   // test_copy_constructor();
-  test_move_constructor();
+  // test_move_constructor();
 // 	test_clear();
 	 
 }
