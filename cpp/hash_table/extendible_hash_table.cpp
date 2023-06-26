@@ -58,9 +58,9 @@ bucket_size_(other.bucket_size_), global_depth_(other.global_depth_),  num_bucke
   dir_.resize(num_buckets_);
   for (int i = 0; i < num_buckets_; i++) {
     dir_[i] = other.dir_[i];  
-    other.dir_[i] = nullptr;
+    // other.dir_[i] = nullptr;
   }
-  other.size_ = 0;
+  other.clear();
 }
 
 // copy assignment operator
@@ -86,9 +86,9 @@ EXTENDIBLE_HASH_TABLE_TYPE& EXTENDIBLE_HASH_TABLE_TYPE::operator=(ExtendibleHash
   dir_.resize(num_buckets_);
   for (int i = 0; i < num_buckets_; i++) {
     dir_[i] = other.dir_[i];  
-    other.dir_[i] = nullptr;
+    //other.dir_[i] = nullptr;
   }
-  other.size_ = 0;
+  other.clear();
   return *this;
 }
  
@@ -182,8 +182,10 @@ auto EXTENDIBLE_HASH_TABLE_TYPE::insert_or_assign(const K &key, const V &value) 
   std::unique_lock<std::shared_mutex> lock(mutex_);
   int old_num_buckets_ = num_buckets_;
   // std::cout << "insert(" << key <<"," << value << ")"<< std::endl;
-  std::shared_ptr<Bucket> bucket = dir_[indexOf(key)];
+  size_t bucket_index = indexOf(key);
+  std::shared_ptr<Bucket> bucket = dir_[bucket_index];
   if (bucket->isFull()) {
+    // extend dir
     if (bucket->getDepth() == global_depth_) {
       int high_bit = 1 << global_depth_;
       num_buckets_ *= 2;
@@ -195,6 +197,7 @@ auto EXTENDIBLE_HASH_TABLE_TYPE::insert_or_assign(const K &key, const V &value) 
       }
     }
 
+    // split bucket
     std::shared_ptr<Bucket> bucket0 = std::make_shared<Bucket>(bucket_size_, bucket->getDepth() + 1);
     std::shared_ptr<Bucket> bucket1 = std::make_shared<Bucket>(bucket_size_, bucket->getDepth() + 1);
     int local_hight_bit = 1 << (bucket->getDepth());
@@ -203,12 +206,13 @@ auto EXTENDIBLE_HASH_TABLE_TYPE::insert_or_assign(const K &key, const V &value) 
       new_buket->insert_or_assign(node->value.first, node->value.second);
     }
 
-    for (int i = std::hash<K>()(key) & (local_hight_bit - 1); i < num_buckets_; i += local_hight_bit) {
+    //i = std::hash<K>()(key) & (local_hight_bit - 1)
+    for (int i = bucket_index & (local_hight_bit - 1); i < num_buckets_; i += local_hight_bit) {
       dir_[i] = (i & local_hight_bit) == 0 ? bucket0 : bucket1;
     }
   }
 
-  size_t bucket_index = indexOf(key);
+  bucket_index = indexOf(key);
   bucket = dir_[bucket_index];
   auto [node, is_insert] = bucket->insert_or_assign(key, value);
   if(node == nullptr){
@@ -334,7 +338,9 @@ void EXTENDIBLE_HASH_TABLE_TYPE::Bucket::clear(){
     auto temp = node;
     node = node->next;
     delete temp;
+    // temp = nullptr;
   }
+  list_ = nullptr;
   size_ = 0;
   depth_ = 0;
 }

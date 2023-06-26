@@ -361,9 +361,13 @@ public:
           node_ = node_->next; 
           if (node_ == nullptr) { // if you reach the end of the bucket, find the next bucket
               for (++bucket_index_; bucket_index_ < dir_->size(); ++bucket_index_) {
-                  node_ = (*dir_)[bucket_index_]->getList();
-                  if (node_ != nullptr) {
-                      return *this;
+                  std::shared_ptr<Bucket> bucket = (*dir_)[bucket_index_];
+                  size_t local_hight_bit = 1 << (bucket->getDepth());
+                  if(bucket_index_ < local_hight_bit) {
+                    node_ = bucket->getList();
+                    if (node_ != nullptr) {
+                        return *this;
+                    }
                   }
               }
           }
@@ -428,9 +432,17 @@ public:
       * so a client can't randomly construct a ExtendibleHashTableIterator without asking for one 
       * through the HashMap's interface.
       */
-      ExtendibleHashTableIterator(std::vector<std::shared_ptr<Bucket> > * dir, size_t bucket_index, Node * node) : dir_(dir),
+      ExtendibleHashTableIterator(std::vector<std::shared_ptr<Bucket> > * dir, size_t bucket_index, Node * node) : 
+      dir_(dir),
       bucket_index_(bucket_index),
-      node_(node) { }
+      node_(node) { 
+        if(bucket_index < dir->size()){
+          std::shared_ptr<Bucket> bucket = (*dir)[bucket_index];
+          size_t local_hight_bit = 1 << (bucket->getDepth());
+          bucket_index_ = bucket_index & (local_hight_bit - 1);
+        }
+      }
+        
 
   };
   

@@ -2,11 +2,31 @@
 #include <string>
 #include <memory>
 #include <unordered_map>
+#include <vector>
+#include <map>
 #include "extendible_hash_table.h"
 using std::cin;
 using std::cout;
 using std::endl;
  
+template <typename K, typename V>
+void print_map(ExtendibleHashTable<K, V> map, std::string header="map"){
+  std::cout << header << " : " ;
+  for (auto& p : map){
+    std::cout << "(" << p.first << "," << p.second << ") ";
+  }
+  std::cout << std::endl;
+  map.show();
+}
+
+template <typename Map>
+void print_map2(Map map, std::string header="map"){
+  std::cout << header << " : " ;
+  for (auto& p : map){
+    std::cout << "(" << p.first << "," << p.second << ") ";
+  }
+  std::cout << std::endl;
+}
 
 void test()
 {
@@ -15,6 +35,7 @@ void test()
   std::cout << "=============Mytest=============" << std::endl;
   ASSERT(table.empty() , "assert empty");
   table.insert(16, 16);
+  print_map(table);
   table.insert(4, 4);
   table.insert(6, 6);
   table.insert(22, 22);
@@ -30,10 +51,11 @@ void test()
   ASSERT(table.insert_or_assign({5, 5}).second, "insert_or_assgin");
   ASSERT(!table.insert_or_assign({5, 55}).second, "insert_or_assgin");
 
-  // for(int i=0; i< 10000; i++){
-  // 	table.insert_or_assign(i, i);
-  // }
-   
+  std::cout << "map:" ;
+  for (auto& p : table){
+    std::cout << "(" << p.first << "," << p.second << ") ";
+  }
+  std::cout << std::endl;
   table.show();
 
 
@@ -122,33 +144,32 @@ void test_at() {
 }
 
 void test_erase() {
-	std::cout << "============= test erase =============" << std::endl;
-   ExtendibleHashTable<int, std::string> c =
+   std::cout << "============= test erase =============" << std::endl;
+   ExtendibleHashTable<int, std::string> map =
     {
         {1, "one" }, {2, "two" }, {3, "three"},
-        {4, "four"}, {5, "five"}, {6, "six"  }
+        {4, "four"}, {5, "five"}, {6, "six"  },
+        {7, "seven"}, {8, "eight"}, {9, "nine" }
     };
 
-    for (auto& p : c)
-        std::cout << p.second << ", ";
+    std::cout << "before erase:" << std::endl;
+    print_map(map);
 
-    std::cout << std::endl;
- 
+    std::cout << "erase 2:" << std::endl;
+    map.erase(2);
+    print_map(map);
+    
+    std::cout << "after erase:" << std::endl;
     // erase all odd numbers from c
-    for (auto it = c.begin(); it != c.end();)
+    for (auto it = map.begin(); it != map.end();)
     {
         if (it->first % 2 != 0)
-            it = c.erase(it);
+            it = map.erase(it);
         else
             ++it;
     }
 
-    std::cout << std::endl;
- 
-    for (auto& p : c)
-        std::cout << p.second << ", ";
-
-    std::cout << std::endl;
+    print_map(map);
 }
 
  
@@ -201,28 +222,57 @@ void test_copy_assiment() {
 
 }
 
-void test_copy_and_move_constructor() {
+void test_copy_constructor() {
 	std::cout << "=============test_copy_and_move_constructor=============" << std::endl;
 	ExtendibleHashTable<int, std::string> map =
     {
         {1, "one" }, {2, "two" }, {3, "three"},
-        {4, "four"}, {5, "five"}, {6, "six"  }
+        {4, "four"}, {5, "five"}, {6, "six"  },
+        {7, "seven"}, {8, "eight"}, {9, "nine" }
+        
     };
 
     ExtendibleHashTable<int, std::string> map1=map;
+    map1[5]="5";
+    
+    print_map(map, "map");
+    print_map(map1, "map1");
 
    
-    for (auto& p : map1){
-        std::cout << "(" << p.first << "," << p.second << ") ";
-    }
-    std::cout << std::endl;
 
-    ExtendibleHashTable<int, std::string> map2 = std::move(map1);
-    for (auto& p : map2){
-        std::cout << "(" << p.first << "," << p.second << ") ";
-    }
-    std::cout << std::endl;
-    map2.show();
+}
+
+void test_move_constructor() {
+    std::cout << "=============test move constructor=============" << std::endl;
+    ExtendibleHashTable<int, std::string> map =
+    {
+        {1, "one" }, {2, "two" }, {3, "three"},
+        {4, "four"}, {5, "five"}, {6, "six"  },
+        {7, "seven"}, {8, "eight"}, {9, "nine" }
+        
+    };
+
+   print_map(map, "map");
+   ExtendibleHashTable<int, std::string> map2 = std::move(map);
+   print_map(map2, "map2");
+   print_map(map, "map");
+
+}
+
+void test_std_map_move_constructor2() {
+    std::cout << "=============test move constructor=============" << std::endl;
+    std::unordered_map<int, std::string> map =
+    {
+        {1, "one" }, {2, "two" }, {3, "three"},
+        {4, "four"}, {5, "five"}, {6, "six"  },
+        {7, "seven"}, {8, "eight"}, {9, "nine" }
+        
+    };
+
+   print_map2(map, "map");
+   std::unordered_map<int, std::string> map2 = std::move(map);
+   print_map2(map2, "map2");
+   print_map2(map, "map");
 
 }
 
@@ -233,7 +283,8 @@ void test_clear() {
   ExtendibleHashTable<int, std::string> map =
     {
         {1, "one" }, {2, "two" }, {3, "three"},
-        {4, "four"}, {5, "five"}, {6, "six"  }
+        {4, "four"}, {5, "five"}, {6, "six"  },
+        {7, "seven"}, {8, "eight"}, {9, "nine" }
     };
 
     std::cout << "before clear " << std::endl;
@@ -257,10 +308,11 @@ int main(){
   test();
   
   test_erase();
-  test_at();
-  test_move_assiment();
-  test_copy_assiment();
-  test_copy_and_move_constructor();
-	test_clear();
+  // test_at();
+  // test_move_assiment();
+  // test_copy_assiment();
+  // test_copy_constructor();
+  test_move_constructor();
+// 	test_clear();
 	 
 }
