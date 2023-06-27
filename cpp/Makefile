@@ -13,7 +13,7 @@ INCLUDES += -I$(ROOT)/common/include
 
 
 PROGS =	$(DEST)/stock10_usage $(DEST)/mytime3_usage $(DEST)/brass_usage \
-				$(DEST)/vegnews $(DEST)/stdmove $(DEST)/typecast \
+				$(DEST)/vegnews $(DEST)/dumb_array $(DEST)/typecast \
 				$(DEST)/container_usage  $(DEST)/shared_ptr_test \
 				$(DEST)/mutable_usage \
 				$(DEST)/allocator_demo $(DEST)/extendible_hash_table
@@ -25,7 +25,7 @@ LIBCOMMON=$(DEST)/libusgcommon.a
 all:	$(LIBCOMMON) $(PROGS)
 
 # extendible_hash_table
-$(DEST)/extendible_hash_table : hash_table/main.cpp hash_table/extendible_hash_table.h
+$(DEST)/extendible_hash_table : hash_table/main.cpp hash_table/extendible_hash_table.h hash_table/extendible_hash_table_impl.h
 		$(CC) ${CPPFLAGS} $(CFLAGS) $(LDFLAGS) $(filter %.cpp, $^) -o $@ $(LDLIBS)
 # class
 $(DEST)/stock10_usage : stock10_usage.cpp stock10.cpp
@@ -40,7 +40,7 @@ $(DEST)/brass_usage: brass_usage.cpp brass.cpp
 $(DEST)/vegnews:  string1.cpp
 
 # class: copy constructors, move constructors, copy assignment operators, and move assignment operators
-$(DEST)/stdmove: stdmove.cpp
+$(DEST)/dumb_array: dumb_array.cpp
 
 $(DEST)/typecast: typecast.cpp
 

@@ -41,7 +41,6 @@ bucket_size_(other.bucket_size_), global_depth_(other.global_depth_),  num_bucke
   dir_.resize(num_buckets_);
   for (int i = 0; i < num_buckets_; i++) {
     dir_[i] = other.dir_[i];  
-    // other.dir_[i] = nullptr;
   }
   other.clear();
 }
@@ -69,7 +68,6 @@ EXTENDIBLE_HASH_TABLE_TYPE& EXTENDIBLE_HASH_TABLE_TYPE::operator=(ExtendibleHash
   dir_.resize(num_buckets_);
   for (int i = 0; i < num_buckets_; i++) {
     dir_[i] = other.dir_[i];  
-    //other.dir_[i] = nullptr;
   }
   other.clear();
   return *this;
@@ -313,7 +311,9 @@ void EXTENDIBLE_HASH_TABLE_TYPE::show() {
 // Bucket
 //===--------------------------------------------------------------------===//
 template <typename K, typename V>
-EXTENDIBLE_HASH_TABLE_TYPE::Bucket::Bucket(size_t capcity, int depth) : capcity_(capcity), depth_(depth) {}
+EXTENDIBLE_HASH_TABLE_TYPE::Bucket::Bucket(size_t capcity, int depth) : capcity_(capcity), depth_(depth) {
+  std::cout << "Bucket construct" << std::endl;
+}
 
 template <typename K, typename V>
 EXTENDIBLE_HASH_TABLE_TYPE::Bucket::~Bucket(){

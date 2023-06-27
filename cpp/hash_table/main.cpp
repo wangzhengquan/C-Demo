@@ -310,6 +310,7 @@ void test_clear() {
 }
 
 int main(){
+   
   test();
   
   test_erase();
