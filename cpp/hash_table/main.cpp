@@ -312,11 +312,11 @@ int main(){
   test();
   
   test_erase();
-  // test_at();
-  // test_move_assiment();
-  // test_copy_assiment();
-  // test_copy_constructor();
-  // test_move_constructor();
-// 	test_clear();
+  test_at();
+  test_move_assiment();
+  test_copy_assiment();
+  test_copy_constructor();
+  test_move_constructor();
+	test_clear();
 	 
 }

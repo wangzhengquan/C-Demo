@@ -201,13 +201,19 @@ auto EXTENDIBLE_HASH_TABLE_TYPE::insert_or_assign(const K &key, const V &value) 
     std::shared_ptr<Bucket> bucket0 = std::make_shared<Bucket>(bucket_size_, bucket->getDepth() + 1);
     std::shared_ptr<Bucket> bucket1 = std::make_shared<Bucket>(bucket_size_, bucket->getDepth() + 1);
     int local_hight_bit = 1 << (bucket->getDepth());
+    // split the bucket into two bucket according to the (bucket->getDepth()+1)'th bit of the hash value of the node's key 
     for(Node *node = bucket->list_; node != nullptr; node = node->next){
       std::shared_ptr<Bucket> new_buket = (std::hash<K>()(node->value.first) & local_hight_bit) == 0 ? bucket0 : bucket1;
       new_buket->insert_or_assign(node->value.first, node->value.second);
     }
 
-    //i = std::hash<K>()(key) & (local_hight_bit - 1)
+    /* 
+     * All of the dir items whose index  has the same low 'bucket->getDepth()' bits with 'bucket_index' points to the same bucket,
+     * All of them should be split into two buckets base on the (bucket->getDepth()+1)'th bit of their corresponding index.
+     */
+    // int i = std::hash<K>()(key) & (local_hight_bit - 1)
     for (int i = bucket_index & (local_hight_bit - 1); i < num_buckets_; i += local_hight_bit) {
+      // if bucket->getDepth()'th bit of the i is 0 set dir_[i] points to bucket0, else to bucket1;
       dir_[i] = (i & local_hight_bit) == 0 ? bucket0 : bucket1;
     }
   }
@@ -313,12 +319,6 @@ void EXTENDIBLE_HASH_TABLE_TYPE::show() {
   }
   std::cout << "--------------------------------------" << std::endl;
 }
-
-
-// std::ostream& operator<<(std::ostream& os, const ExtendibleHashTable& obj){
-//   return os;
-
-// }
 
 
 //===--------------------------------------------------------------------===//
