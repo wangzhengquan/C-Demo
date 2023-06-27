@@ -15,8 +15,8 @@ INCLUDES += -I$(ROOT)/common/include
 PROGS =	$(DEST)/stock10_usage $(DEST)/mytime3_usage $(DEST)/brass_usage \
 				$(DEST)/vegnews $(DEST)/stdmove $(DEST)/typecast \
 				$(DEST)/container_usage  $(DEST)/shared_ptr_test \
-				$(DEST)/binary_format  $(DEST)/mutable_usage \
-				$(DEST)/allocator_demo $(DEST)/hash_table/extendible_hash_table
+				$(DEST)/mutable_usage \
+				$(DEST)/allocator_demo $(DEST)/extendible_hash_table
 
 DEPENDENCES = $(patsubst %, %.d, $(PROGS)) 
 
@@ -25,7 +25,8 @@ LIBCOMMON=$(DEST)/libusgcommon.a
 all:	$(LIBCOMMON) $(PROGS)
 
 # extendible_hash_table
-$(DEST)/hash_table/extendible_hash_table : hash_table/main.cpp hash_table/extendible_hash_table.cpp hash_table/extendible_hash_table.h
+$(DEST)/extendible_hash_table : hash_table/main.cpp hash_table/extendible_hash_table.h
+		$(CC) ${CPPFLAGS} $(CFLAGS) $(LDFLAGS) $(filter %.cpp, $^) -o $@ $(LDLIBS)
 # class
 $(DEST)/stock10_usage : stock10_usage.cpp stock10.cpp
 

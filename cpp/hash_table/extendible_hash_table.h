@@ -21,8 +21,10 @@
 #include <vector>
 #include <cassert>
 #include <stdexcept>
+#include <bitset>
+#include <cstdlib>
+#include <functional>
 
-#define DEFAULT_BUCKET_SIZE 4
 
 #define EXTENDIBLE_HASH_TABLE_TEMPLATE_ARGUMENTS template <typename K, typename V>
 #define EXTENDIBLE_HASH_TABLE_TYPE ExtendibleHashTable<K, V>
@@ -37,6 +39,7 @@
 EXTENDIBLE_HASH_TABLE_TEMPLATE_ARGUMENTS
 class ExtendibleHashTable  {
 private:
+  static const int  DEFAULT_BUCKET_SIZE = 4;
   class Bucket;
 
   template <bool>
@@ -444,30 +447,8 @@ private:
 
 // ========================= Implemention =====================================
 
-template <typename K, typename V>
-inline auto EXTENDIBLE_HASH_TABLE_TYPE::empty() const -> bool {
-  // return size_ == 0;
-  return cbegin() == cend();
-}
 
-template <typename K, typename V>
-template <bool IsConst>
-EXTENDIBLE_HASH_TABLE_TYPE::ExtendibleHashTableIterator<IsConst>& EXTENDIBLE_HASH_TABLE_TYPE::ExtendibleHashTableIterator<IsConst>::operator++(){
-  node_ = node_->next; 
-  if (node_ == nullptr) { // if you reach the end of the bucket, find the next bucket
-      for (++bucket_index_; bucket_index_ < dir_->size(); ++bucket_index_) {
-          std::shared_ptr<Bucket> bucket = (*dir_)[bucket_index_];
-          size_t local_hight_bit = 1 << (bucket->getDepth());
-          if(bucket_index_ < local_hight_bit) {
-            node_ = bucket->getList();
-            if (node_ != nullptr) {
-                return *this;
-            }
-          }
-      }
-  }
-  return *this;
-}
+#include "extendible_hash_table_impl.h"
 
  
 

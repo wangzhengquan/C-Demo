@@ -1,18 +1,54 @@
 #include "comm_inc.h"
 #include <bitset> 
  
-int main(int argc, char *argv[]) {
-    // uint64_t my_num = 6;
-    // std::bitset<64> bits (my_num);
-    // std::bitset<64> bits1(~my_num);
-    // std::bitset<64> bits2(!my_num);
-    // std::cout << bits << std::endl;
-    // std::cout << bits1 << std::endl;
-    // std::cout << bits2 << std::endl;
+// int main(int argc, char *argv[]) {
+     
+// }
 
-    int i = -1;
-    // uint b = static_cast<uint>(i);
-    uint b = uint(i);
-    std::cout << b << std::endl;
-    return 0;
+// primary template
+template<class T>
+struct A
+{ 
+    struct B {};
+ 
+    void f(){
+        printf("hello");
+    }
+ 
+    struct D { void g(); };
+ 
+    T h();
+ 
+    template<T U>
+    T i();
+};
+ 
+// full specialization
+template<>
+struct A<int>
+{
+    struct B {};
+ 
+    int f();
+ 
+    struct D { void g(); };
+ 
+    template<int U>
+    int i();
+};
+
+
+// another full specialization
+template<>
+struct A<float*>
+{
+    int *h();
+};
+ 
+int main()
+{
+    // float f = 1.0;
+    A<char> a;
+    a.f();
+    
 }
