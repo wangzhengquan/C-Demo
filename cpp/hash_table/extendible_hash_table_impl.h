@@ -6,12 +6,6 @@ EXTENDIBLE_HASH_TABLE_TYPE::ExtendibleHashTable(size_t bucket_size, int global_d
       num_buckets_(1 << global_depth),
       dir_(num_buckets_) {
 
-  // int reserve_size = 8;
-  // if(reserve_size > num_buckets_) {
-  //   dir_.reserve(reserve_size);
-  // }
-  
-   
   for (int i = 0; i < num_buckets_; i++) {
     dir_[i] = std::make_shared<Bucket>(bucket_size_, global_depth_);
   }
