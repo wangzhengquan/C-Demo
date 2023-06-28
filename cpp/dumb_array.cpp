@@ -166,6 +166,7 @@ public:
         swap(first.array_, second.array_);
     }
 
+
     int& operator[](int i) {
         return array_[i];
     }
