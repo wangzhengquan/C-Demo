@@ -188,6 +188,7 @@ public:
   }
 
   void show();
+  auto check() -> bool;
 
 private:
   /*****************************************************************
@@ -200,24 +201,7 @@ private:
    * @return The entry index in the directory.
    */
   auto indexOf(const K &key) -> size_t;
-  /**
-   * @brief Get the global depth of the directory.
-   * @return The global depth of the directory.
-   */
-  auto getGlobalDepth() const -> int;
-
-  /**
-   * @brief Get the local depth of the bucket that the given directory index points to.
-   * @param dir_index The index in the directory.
-   * @return The local depth of the bucket.
-   */
-  auto getLocalDepth(int dir_index) const -> int;
-
-  /**
-   * @brief Get the number of buckets in the directory.
-   * @return The number of buckets in the directory.
-   */
-  auto getNumBuckets() const -> int;
+   
 
 
 private:
@@ -437,7 +421,7 @@ private:
   size_t bucket_size_;  // The size of a bucket
   int global_depth_;    // The global depth of the directory
   int num_buckets_;     // The number of buckets in the hash table
-  mutable std::shared_mutex mutex_;
+  // mutable std::shared_mutex mutex_;
   std::vector<std::shared_ptr<Bucket>> dir_;  // The directory of the hash table
   size_t size_ = 0;
 };

@@ -24,6 +24,7 @@ void _dolog(const char *file, const int line, const char *fmt, va_list ap) {
   fflush(stdout); /* in case stdout and stderr are the same */
   
   fputs(buf, stdout);
+  // fflush(stdout);
  
 }
 

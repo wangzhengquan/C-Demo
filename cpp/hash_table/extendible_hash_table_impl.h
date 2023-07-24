@@ -76,28 +76,11 @@ EXTENDIBLE_HASH_TABLE_TYPE& EXTENDIBLE_HASH_TABLE_TYPE::operator=(ExtendibleHash
 
 template <typename K, typename V>
 auto EXTENDIBLE_HASH_TABLE_TYPE::indexOf(const K &key) -> size_t {
-  std::shared_lock<std::shared_mutex> lock(mutex_);
   int mask = (1 << global_depth_) - 1;
   return std::hash<K>()(key) & mask;
 }
 
-template <typename K, typename V>
-auto EXTENDIBLE_HASH_TABLE_TYPE::getGlobalDepth() const -> int {
-  std::shared_lock<std::shared_mutex> lock(mutex_);
-  return global_depth_;
-}
 
-template <typename K, typename V>
-auto EXTENDIBLE_HASH_TABLE_TYPE::getLocalDepth(int dir_index) const -> int {
-  std::shared_lock<std::shared_mutex> lock(mutex_);
-  return dir_[dir_index]->getDepth();
-}
-
-template <typename K, typename V>
-auto EXTENDIBLE_HASH_TABLE_TYPE::getNumBuckets() const -> int {
-  std::shared_lock<std::shared_mutex> lock(mutex_);
-  return num_buckets_;
-}
 
 template <typename K, typename V>
 auto EXTENDIBLE_HASH_TABLE_TYPE::find(const K &key) const -> ConstIterator {
@@ -106,7 +89,6 @@ auto EXTENDIBLE_HASH_TABLE_TYPE::find(const K &key) const -> ConstIterator {
 
 template <typename K, typename V>
 auto EXTENDIBLE_HASH_TABLE_TYPE::find(const K &key) -> Iterator {
-  std::shared_lock<std::shared_mutex> lock(mutex_);
   size_t bucket_index = indexOf(key);
   Node *node = dir_[bucket_index]->find(key);
 
@@ -120,7 +102,6 @@ auto EXTENDIBLE_HASH_TABLE_TYPE::find(const K &key) -> Iterator {
 
 template <typename K, typename V>
 auto EXTENDIBLE_HASH_TABLE_TYPE::erase(const K &key) -> bool {
-  std::unique_lock<std::shared_mutex> lock(mutex_);
   Iterator pos = find(key);
   if(pos == end()){
     return false;
@@ -131,7 +112,6 @@ auto EXTENDIBLE_HASH_TABLE_TYPE::erase(const K &key) -> bool {
 
 template <typename K, typename V>
 auto EXTENDIBLE_HASH_TABLE_TYPE::erase(EXTENDIBLE_HASH_TABLE_TYPE::Iterator pos) -> Iterator {
-  std::unique_lock<std::shared_mutex> lock(mutex_);
   std::shared_ptr<Bucket> bucket = dir_[pos.bucket_index_];
   bucket->remove(pos++.node_);
   size_--;
@@ -160,22 +140,18 @@ auto EXTENDIBLE_HASH_TABLE_TYPE::insert_or_assign(const ElementType & pair) -> s
 
 template <typename K, typename V>
 auto EXTENDIBLE_HASH_TABLE_TYPE::insert_or_assign(const K &key, const V &value) -> std::pair<Iterator, bool> {
-  std::unique_lock<std::shared_mutex> lock(mutex_);
-  int old_num_buckets_ = num_buckets_;
   // std::cout << "insert(" << key <<"," << value << ")"<< std::endl;
   size_t bucket_index = indexOf(key);
   std::shared_ptr<Bucket> bucket = dir_[bucket_index];
-  if (bucket->isFull()) {
+  while (bucket->isFull()) {
     // extend dir
     if (bucket->getDepth() == global_depth_) {
-      int high_bit = 1 << global_depth_;
+      dir_.resize(num_buckets_*2);
+      for (int i = 0; i < num_buckets_; i++) {
+        dir_[i + num_buckets_] = dir_[i];
+      }
       num_buckets_ *= 2;
       global_depth_++;
-      dir_.resize(num_buckets_);
-      for (int i = 0; i < old_num_buckets_; i++) {
-        // LOG_DEBUG("%d, %d, %d, %d\n", i, high_bit, i + high_bit, num_buckets_);
-        dir_[i + high_bit] = dir_[i];
-      }
     }
 
     // split bucket
@@ -193,14 +169,16 @@ auto EXTENDIBLE_HASH_TABLE_TYPE::insert_or_assign(const K &key, const V &value) 
      * All of them should be split into two buckets base on the (bucket->getDepth()+1)'th bit of their corresponding index.
      */
     // int i = std::hash<K>()(key) & (local_hight_bit - 1)
-    for (int i = bucket_index & (local_hight_bit - 1); i < num_buckets_; i += local_hight_bit) {
+    for (int i = std::hash<K>()(key) & (local_hight_bit - 1); i < num_buckets_; i += local_hight_bit) {
       // if bucket->getDepth()'th bit of the i is 0 set dir_[i] points to bucket0, else to bucket1;
       dir_[i] = (i & local_hight_bit) == 0 ? bucket0 : bucket1;
     }
+
+    bucket_index = indexOf(key);
+    bucket = dir_[bucket_index];
   }
 
-  bucket_index = indexOf(key);
-  bucket = dir_[bucket_index];
+  
   auto [node, is_insert] = bucket->insert_or_assign(key, value);
   if(node == nullptr){
     return {end(), false};
@@ -306,6 +284,28 @@ void EXTENDIBLE_HASH_TABLE_TYPE::show() {
   std::cout << "--------------------------------------" << std::endl;
 }
 
+template <typename K, typename V>
+auto EXTENDIBLE_HASH_TABLE_TYPE::check() -> bool{
+  int suc = true;
+  for (int i = 0; i < num_buckets_; i++) {
+    std::shared_ptr<Bucket> bucket = dir_[i];
+    if(!bucket){
+      std::cout << "bucket " << i <<" is null. ";
+      suc = false;
+      continue;
+    }
+    int mask = (1 << (bucket->getDepth())) - 1;   
+    for(Node *node = bucket->list_; node != nullptr; node = node->next){
+      int keybit = std::hash<K>()(node->value.first ) & mask;
+      if(keybit != (i & mask)){
+        suc = false;
+        std::cout << "keybit , i=" << i << ", key=" << node->value.first << std::endl;
+      }
+    }
+  }
+  return suc;
+}
+
 
 //===--------------------------------------------------------------------===//
 // Bucket
@@ -388,6 +388,8 @@ auto EXTENDIBLE_HASH_TABLE_TYPE::Bucket::insert_or_assign(const K &key, const V 
 
   return {nullptr, false};
 }
+
+
 
 
 //===--------------------------------------------------------------------===//

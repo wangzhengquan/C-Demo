@@ -5,6 +5,14 @@ using std::cin;
 using std::cout;
 using std::endl;
 
+#define BUSTUB_ASSERT(expr, ...)		\
+	if (!(expr)) { \
+      fprintf(stdout, "assertion failed: %s", #expr); \
+   	::fprintf(stdout, __VA_ARGS__);  \
+      while(true); \
+   } \
+  
+
 const int CLIENTS = 4;
 int test(int a, int b) {
 	cout << "a, b" << endl;
@@ -18,7 +26,6 @@ int test(int a) {
 
 int main()
 {
-   test(1, 2);
-   test(1);
+   BUSTUB_ASSERT(1==2, "hello %s", "world");
 
 }

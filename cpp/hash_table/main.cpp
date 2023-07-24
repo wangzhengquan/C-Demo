@@ -1,14 +1,47 @@
+#include <cstdlib>
 #include <iostream>
 #include <string>
 #include <memory>
 #include <unordered_map>
 #include <vector>
 #include <map>
+#include <set>
 #include "extendible_hash_table.h"
 using std::cin;
 using std::cout;
 using std::endl;
  
+
+
+class Check{
+  std::set<int>& keys_inserted;
+  ExtendibleHashTable<int, int>  &table;
+public:
+  Check(std::set<int>& keys_, ExtendibleHashTable<int, int> &table_):
+   keys_inserted(keys_), table(table_){
+
+  }
+  bool operator() () {
+    bool suc = true;
+    for(int key : keys_inserted){
+     
+      auto item = table.find(key);
+      if(item == table.end()){
+        std::cout << "The " << key << "should be found but not ."<< std::endl;
+        suc = false;
+      }
+      if(item->second != key){
+        std::cout << "find value  " << item->second << " dose not equal " <<  key << std::endl;
+        suc = false;
+
+      }
+     
+    }
+    return suc;
+  }
+
+};
+
 
 template <typename K, typename V>
 void print_map(ExtendibleHashTable<K, V> map, std::string header="map"){
@@ -309,8 +342,41 @@ void test_clear() {
     
 }
 
+
+void RandomInsertTest (){
+  ExtendibleHashTable<int, int> table(4);
+  std::set<int> keys_inserted;
+   
+  size_t scale = 10000;
+  std::srand(std::time(nullptr));
+  for (size_t i = 0; i < scale; i++) {
+    int key = std::rand() % scale;
+    table.insert(key, key);
+
+    // std::unique_lock lock(mutex_);
+    std::cout << "insert " << key << std::endl;
+    keys_inserted.insert(key);
+    // lock.unlock();
+
+
+    // table.Show();
+    // ASSERT_EQ(table.Check(), true);
+    // ASSERT_EQ(Check(keys_inserted, table)(), true);
+    // ASSERT_EQ(keys_inserted.size(), table.GetSize());
+  }
+
+   
+  // table.Show();
+  ASSERT(table.check() == true, "table.Check()");
+  ASSERT(Check(keys_inserted, table)() == true, "Check(keys_inserted, table)");
+  ASSERT(keys_inserted.size()== table.size(), "size not equal");
+
+   
+}
+
 int main(){
    
+  RandomInsertTest();
   test();
   
   test_erase();
@@ -319,6 +385,6 @@ int main(){
   test_copy_assiment();
   test_copy_constructor();
   test_move_constructor();
-	test_clear();
+  test_clear();
 	 
 }
